@@ -5,11 +5,11 @@ import java.io.IOException;
 import java.util.Map;
 
 public class FileToMap{
-	public Map<String, String> readMapFromFile(File file) throws IOException{
+	public static  Map<String, String> readMapFromFile(File file) throws IOException{
 		return MapStringConverter.stringToMap(FileHelper.readFile(file));
 	}
 
-	public void readMapToFile(File file, Map<String, String> map) throws IOException{
+	public static void writeMapToFile(File file, Map<String, String> map) throws IOException{
 		FileHelper.writeFile(file, MapStringConverter.mapToString(map));
 	}
 }
