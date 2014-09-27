@@ -5,6 +5,9 @@ import java.util.Map;
 
 public class ParseCompound{
 	public static LinkedHashMap<String, Integer> parseCompound(String compound){
+		if(findNest(compound, Integer.MIN_VALUE, false).getValueOne() != 0){
+			throw new IllegalArgumentException("For input string: " + compound);
+		}
 		boolean inParen = false, inNumber = false, firstEleStart = false,
 				afterParen = false, firstInParen = false, firstAfterParen = false;
 		String tempElement = "";
@@ -15,6 +18,10 @@ public class ParseCompound{
 			char cati = compound.charAt(i);
 			boolean parenEnd = cati == ')';
 			if(cati >= 'A' && cati <= 'Z' || parenEnd){
+				if(parenEnd){
+					inParen = false;
+					firstInParen = false;
+				}
 				if(!firstEleStart){
 					firstEleStart = true;
 					firstInParen = false;
@@ -22,7 +29,6 @@ public class ParseCompound{
 				else{
 					boolean inf = inParen && !firstInParen;
 					if(parenEnd){
-						inParen = false;
 						afterParen = true;
 						firstAfterParen = true;
 					}
@@ -95,33 +101,32 @@ public class ParseCompound{
 	}
 
 	private static int findCloseIndex(String compound, int n){
-		int nest = 0;
-		for(int i = 0; i <= n; i++){
-			if(compound.charAt(i) == '('){
-				nest++;
-			}
-			else if(compound.charAt(i) == ')'){
-				nest--;
-			}
-		}
-		int newNest = 0;
-		int lastFound = 0;
-		for(int i = compound.length() - 1; i > n; i--){
-			if(compound.charAt(i) == '('){
-				newNest--;
-			}
-			else if(compound.charAt(i) == ')'){
-				newNest++;
-				if(newNest == nest){
-					lastFound = i;
-				}
-			}
-		}
+		int nest = findNest(compound.substring(0, n + 1), Integer.MIN_VALUE, false).getValueOne();
+		int lastFound = n + 1 + findNest(compound.substring(
+				n + 1, compound.length()), -nest, true).getValueTwo();
 		char cati = compound.charAt(lastFound + 1);
 		if(cati >= '0'&& cati <= '9'){
 			return lastFound + 2;
 		}
 		return lastFound + 1;
+	}
+
+	private static Pair<Integer, Integer> findNest(String value, int target, boolean fromEnd){
+		int lastFound = Integer.MIN_VALUE;
+		int nest = 0;
+		for(int i = 0; i < value.length(); i++){
+			int search = fromEnd ? value.length() - 1 - i : i;
+			if(value.charAt(search) == '('){
+				nest++;
+			}
+			else if(value.charAt(search) == ')'){
+				nest--;
+				if(target == nest){
+					lastFound = search;
+				}
+			}
+		}
+		return new Pair<Integer, Integer>(nest, lastFound);
 	}
 
 	private static void add(LinkedHashMap<String, Integer> elementsInParen,
