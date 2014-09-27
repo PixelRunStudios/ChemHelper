@@ -7,16 +7,16 @@ import java.util.Map;
 
 public class Main{
 
-	public static final String COMPOUND = "CuCl2(H2O)2";
+	public static final String COMPOUND = "H2O";
 	public static void main(String[] args){
 		// TODO Auto-generated method stub
 		Map<String, Integer> elements = ParseCompound.parseCompound(COMPOUND);
 
-		/*for(String name: elements.keySet()){
+		for(String name: elements.keySet()){
 			String key = name.toString();
 			String value = elements.get(name).toString();
 			System.out.println(key + " " + value);
-		}*/
+		}
 
 		try{
 			System.out.println(MolarMass.calculate(elements,

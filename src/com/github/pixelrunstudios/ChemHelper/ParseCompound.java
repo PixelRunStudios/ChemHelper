@@ -10,7 +10,7 @@ public class ParseCompound{
 		String tempElement = "";
 		String tempNumber = "";
 		LinkedHashMap<String,Integer> elements = new LinkedHashMap<String,Integer>();
-		LinkedHashMap<String,Integer> elementsInParenth = new LinkedHashMap<String,Integer>();
+		LinkedHashMap<String,Integer> elementsInParen = new LinkedHashMap<String,Integer>();
 		for(int i = 0; i<compound.length();i++){
 			char cati = compound.charAt(i);
 			boolean parenEnd = cati == ')';
@@ -31,7 +31,7 @@ public class ParseCompound{
 					if(parenEnd || inf || !firstAfterParen){
 						LinkedHashMap<String, Integer> eleTemp;
 						if(parenEnd || inf){
-							eleTemp = elementsInParenth;
+							eleTemp = elementsInParen;
 						}
 						else{
 							eleTemp = elements;
@@ -39,11 +39,13 @@ public class ParseCompound{
 						if(eleTemp.containsKey(tempElement)){
 							tempNumber = Integer.toString(eleTemp.get(tempElement)+Integer.parseInt(tempNumber));
 						}
-						eleTemp.put(tempElement, Integer.parseInt(tempNumber));
+						if(!tempElement.equals("")){
+							eleTemp.put(tempElement, Integer.parseInt(tempNumber));
+						}
 						firstInParen = false;
 					}
 					else{
-						inParenToElements(elements, elementsInParenth, tempNumber);
+						inParenToElements(elements, elementsInParen, tempNumber);
 						firstAfterParen = false;
 						afterParen = false;
 					}
@@ -64,34 +66,86 @@ public class ParseCompound{
 				tempNumber += cati;
 			}
 			else if(cati == '('){
-				inParen = true;
-				firstInParen = true;
+				if(inParen){
+					firstEleStart = true;
+					tempNumber = tempNumber == "" ? "1" : tempNumber;
+					firstAfterParen = false;
+					int z = findCloseIndex(compound, i);
+					String tp = compound.substring(i, z);
+					add(elementsInParen,parseCompound(tp));
+					i = z - 1;
+				}
+				else{
+					inParen = true;
+					firstInParen = true;
+				}
 			}
 		}
 		tempNumber = tempNumber == "" ? "1" : tempNumber;
 		if(afterParen){
-			inParenToElements(elements, elementsInParenth, tempNumber);
+			inParenToElements(elements, elementsInParen, tempNumber);
 		}
 		if(elements.containsKey(tempElement)){
 			tempNumber = Integer.toString(elements.get(tempElement)+Integer.parseInt(tempNumber));
 		}
-		if(tempElement != ""){
+		if(!tempElement.equals("")){
 			elements.put(tempElement, Integer.parseInt(tempNumber));
 		}
 		return elements;
 	}
 
+	private static int findCloseIndex(String compound, int n){
+		int nest = 0;
+		for(int i = 0; i <= n; i++){
+			if(compound.charAt(i) == '('){
+				nest++;
+			}
+			else if(compound.charAt(i) == ')'){
+				nest--;
+			}
+		}
+		int newNest = 0;
+		int lastFound = 0;
+		for(int i = compound.length() - 1; i > n; i--){
+			if(compound.charAt(i) == '('){
+				newNest--;
+			}
+			else if(compound.charAt(i) == ')'){
+				newNest++;
+				if(newNest == nest){
+					lastFound = i;
+				}
+			}
+		}
+		char cati = compound.charAt(lastFound + 1);
+		if(cati >= '0'&& cati <= '9'){
+			return lastFound + 2;
+		}
+		return lastFound + 1;
+	}
+
+	private static void add(LinkedHashMap<String, Integer> elementsInParen,
+			LinkedHashMap<String, Integer> parseCompound){
+		for(Map.Entry<String, Integer> entry : parseCompound.entrySet()){
+			if(elementsInParen.containsKey(entry.getKey())){
+				elementsInParen.put(entry.getKey(), elementsInParen.get(entry.getKey()) + entry.getValue());
+			}
+			else{
+				elementsInParen.put(entry.getKey(), entry.getValue());
+			}
+		}
+	}
+
 	private static void inParenToElements(LinkedHashMap<String, Integer> elements,
-			LinkedHashMap<String, Integer> elementsInParenth, String tempNumber){
-		for(Map.Entry<String, Integer> entry : elementsInParenth.entrySet()){
+			LinkedHashMap<String, Integer> elementsInParen, String tempNumber){
+		for(Map.Entry<String, Integer> entry : elementsInParen.entrySet()){
 			String key = entry.getKey();
 			int value = entry.getValue() * Integer.parseInt(tempNumber);
-			elementsInParenth.put(key, value);
 			if(elements.containsKey(key)){
 				value += elements.get(key);
 			}
 			elements.put(key, value);
 		}
-		elementsInParenth.clear();
+		elementsInParen.clear();
 	}
 }
