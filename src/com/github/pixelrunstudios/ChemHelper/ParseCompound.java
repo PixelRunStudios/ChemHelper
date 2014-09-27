@@ -50,7 +50,9 @@ public class ParseCompound{
 					tempElement = "";
 					tempNumber = "";
 				}
-				tempElement += cati;
+				if(!parenEnd){
+					tempElement += cati;
+				}
 			}
 			else if(cati >= 'a' && cati <= 'z'){
 				tempElement += cati;
