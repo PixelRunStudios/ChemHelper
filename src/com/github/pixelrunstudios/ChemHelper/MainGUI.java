@@ -1,16 +1,22 @@
 package com.github.pixelrunstudios.ChemHelper;
 
+import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.TitledBorder;
 
 public class MainGUI extends JFrame{
 
@@ -19,6 +25,12 @@ public class MainGUI extends JFrame{
 	private JPanel contentPane;
 	private JTextField textField;
 	private JLabel label;
+	private JTextField inEq;
+	private JTextField outEq;
+	private JTextField amt;
+	private JTextField outSub;
+	private JTextField inSub;
+	private JLabel result;
 
 	/**
 	 * Launch the application.
@@ -43,29 +55,53 @@ public class MainGUI extends JFrame{
 	 */
 	public MainGUI(){
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 329, 300);
+		setBounds(100, 100, 450, 400);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
-		contentPane.setLayout(null);
+		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
 
-		textField = new JTextField();
-		textField.setBounds(113, 29, 134, 28);
-		contentPane.add(textField);
-		textField.setColumns(10);
+		JPanel panel_3 = new JPanel();
+		panel_3.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null), "Molar Mass", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+		contentPane.add(panel_3);
+		panel_3.setLayout(new BoxLayout(panel_3, BoxLayout.Y_AXIS));
+
+		JPanel panel = new JPanel();
+		panel_3.add(panel);
 
 		JLabel lblCompound = new JLabel("Compound:");
+		panel.add(lblCompound);
 		lblCompound.setBounds(28, 35, 86, 16);
-		contentPane.add(lblCompound);
 
-		JButton btnGo = new JButton("GO");
+		textField = new JTextField("H2O");
+		textField.setToolTipText("Substance");
+		panel.add(textField);
+		textField.setBounds(113, 29, 134, 28);
+		textField.setColumns(10);
+
+		JPanel panel_1 = new JPanel();
+		panel_3.add(panel_1);
+
+		JLabel lblMolar = new JLabel("Molar mass:");
+		panel_1.add(lblMolar);
+		lblMolar.setBounds(27, 63, 76, 16);
+
+		label = new JLabel("");
+		panel_1.add(label);
+		label.setBounds(113, 63, 179, 16);
+
+		JPanel panel_4 = new JPanel();
+		panel_3.add(panel_4);
+
+		JButton btnGo = new JButton("Go");
+		panel_4.add(btnGo);
 		btnGo.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try{
-					label.setText(String.valueOf(MolarMass.calculate(
-							ParseCompound.parseCompound(textField.getText())
-							, FileToMap.readMapFromFile(new File("elements.txt")), textField.getText())));
+					label.setText(String.valueOf(MolarMass.calculateExpression(
+							ParseCompound.parseExpression(textField.getText())
+							, FileToMap.readMapFromFile(new File("elements.txt")))));
 				}
 				catch(Exception e1){
 					// TODO Auto-generated catch block
@@ -75,14 +111,101 @@ public class MainGUI extends JFrame{
 			}
 		});
 		btnGo.setBounds(249, 30, 54, 29);
-		contentPane.add(btnGo);
 
-		JLabel lblMolar = new JLabel("Molar mass:");
-		lblMolar.setBounds(27, 63, 76, 16);
-		contentPane.add(lblMolar);
+		JPanel panel_2 = new JPanel();
+		panel_2.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null), "Stoichiometry", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+		contentPane.add(panel_2);
+		panel_2.setLayout(new BoxLayout(panel_2, BoxLayout.Y_AXIS));
 
-		label = new JLabel("");
-		label.setBounds(113, 63, 179, 16);
-		contentPane.add(label);
+		JPanel panel_5 = new JPanel();
+		panel_2.add(panel_5);
+
+		JLabel lblEquation = new JLabel("Equation:");
+		panel_5.add(lblEquation);
+
+		inEq = new JTextField("2H2 + O2");
+		panel_5.add(inEq);
+		inEq.setColumns(10);
+
+		JLabel label_1 = new JLabel("->");
+		panel_5.add(label_1);
+
+		outEq = new JTextField("2H2O");
+		panel_5.add(outEq);
+		outEq.setColumns(10);
+
+		JPanel panel_6 = new JPanel();
+		panel_2.add(panel_6);
+
+		JLabel lblConvert = new JLabel("Convert From:");
+		panel_6.add(lblConvert);
+
+		amt = new JTextField();
+		amt.setToolTipText("Amount");
+		amt.setText("1");
+		panel_6.add(amt);
+		amt.setColumns(4);
+
+		JComboBox<String> inUnit = new JComboBox<String>();
+		inUnit.setToolTipText("Unit");
+		inUnit.addItem("g");
+		inUnit.addItem("mol");
+		panel_6.add(inUnit);
+
+		inSub = new JTextField("H2");
+		inSub.setToolTipText("Substance");
+		panel_6.add(inSub);
+		inSub.setColumns(8);
+
+		JPanel panel_7 = new JPanel();
+		panel_2.add(panel_7);
+
+		JLabel lblTo = new JLabel("Convert To:");
+		panel_7.add(lblTo);
+
+		JComboBox<String> outUnit = new JComboBox<String>();
+		outUnit.setToolTipText("Unit");
+		outUnit.addItem("g");
+		outUnit.addItem("mol");
+		panel_7.add(outUnit);
+
+		outSub = new JTextField("H2O");
+		outSub.setToolTipText("Substance");
+		panel_7.add(outSub);
+		outSub.setColumns(8);
+
+		JPanel panel_8 = new JPanel();
+		panel_2.add(panel_8);
+
+		JLabel lblResult = new JLabel("Result:");
+		panel_8.add(lblResult);
+
+		result = new JLabel("");
+		panel_8.add(result);
+
+		JPanel panel_9 = new JPanel();
+		panel_2.add(panel_9);
+
+		JButton btnGo_1 = new JButton("Go");
+		panel_9.add(btnGo_1);
+		btnGo_1.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try{
+					double out = Stoichiometry.convert(inEq.getText(), outEq.getText(),
+							Double.parseDouble(amt.getText()),
+							inUnit.getItemAt(inUnit.getSelectedIndex()),
+							inSub.getText(),
+							outUnit.getItemAt(outUnit.getSelectedIndex()),
+							outSub.getText(),
+							FileToMap.readMapFromFile(new File("elements.txt")));
+					result.setText(String.valueOf(out));
+				}
+				catch(NumberFormatException | IOException e1){
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
 	}
 }

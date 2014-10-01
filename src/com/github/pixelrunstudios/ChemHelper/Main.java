@@ -20,7 +20,7 @@ public class Main{
 
 		try{
 			System.out.println(MolarMass.calculate(elements,
-					FileToMap.readMapFromFile(new File("elements.txt")), COMPOUND));
+					FileToMap.readMapFromFile(new File("elements.txt"))));
 		}
 		catch(IOException e){
 			// TODO Auto-generated catch block

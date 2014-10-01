@@ -1,5 +1,6 @@
 package com.github.pixelrunstudios.ChemHelper;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -152,5 +153,57 @@ public class ParseCompound{
 			elements.put(key, value);
 		}
 		elementsInParen.clear();
+	}
+
+	public static Map<Map<String, Integer>, Integer>
+	parseExpression(String in){
+		Map<Map<String, Integer>, Integer> map =
+				new HashMap<Map<String, Integer>, Integer>();
+		in = in.replace(" ", "");
+		String[] sa = in.split("\\+");
+		for(String s : sa){
+			String tempNumber = "";
+			int counter = 0;
+			char cati = s.charAt(counter);
+			while(cati >= '0'&& cati <= '9'){
+				tempNumber += cati;
+				cati = s.charAt(++counter);
+			}
+			if(tempNumber.equals("")){
+				tempNumber = "1";
+			}
+			int n = Integer.parseInt(tempNumber);
+			if(n > 0){
+				map.put(parseCompound(s.substring(counter)), n);
+			}
+		}
+		return map;
+	}
+
+	public static Pair<Map<Map<String, Integer>, Integer>, Map<Map<String, Integer>, Integer>>
+	parseEquation(String in, String out){
+		Map<Map<String, Integer>, Integer> inX = parseExpression(in);
+		Map<Map<String, Integer>, Integer> outX = parseExpression(out);
+		if(balanced(inX, outX)){
+			return new Pair<Map<Map<String, Integer>, Integer>,
+					Map<Map<String, Integer>, Integer>>(inX, outX);
+		}
+		else{
+			return balance(inX, outX);
+		}
+	}
+
+	private static Pair<Map<Map<String, Integer>, Integer>,
+	Map<Map<String, Integer>, Integer>> balance(
+			Map<Map<String, Integer>, Integer> inX,
+			Map<Map<String, Integer>, Integer> outX){
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private static boolean balanced(Map<Map<String, Integer>, Integer> inX,
+			Map<Map<String, Integer>, Integer> outX){
+		// TODO Auto-generated method stub
+		return true;
 	}
 }
