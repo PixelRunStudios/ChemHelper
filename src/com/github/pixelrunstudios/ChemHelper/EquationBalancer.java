@@ -93,8 +93,31 @@ public class EquationBalancer{
 		finale[0] = new BigFraction(1, 1);
 		finalePut[0] = true;
 		boolean finalePutFull = false;
-		while(!finalePutFull){
-			Pair<Integer[], BigFraction[][]> pair = solve(newArrayRow, mapNum, system, numOfEle);
+
+		Set<Integer> set = new HashSet<Integer>();
+
+		for(int i = 0; i < elements.size(); i++){
+			set.add(i);
+		}
+
+		Set<Set<Integer>> is = SubsetHelper.subsets(set);
+		Set<Set<Integer>> ins = new HashSet<Set<Integer>>();
+		for(Set<Integer> s : is){
+			if(!(s.size() == newArrayRow) || !s.contains(1)){
+
+			}
+			else{
+				ins.add(s);
+			}
+		}
+		for(Set<Integer> s : ins){
+			Integer[] ia = new Integer[newArrayRow];
+			int ooo = 0;
+			for(Integer i : s){
+				ia[ooo] = i;
+				ooo++;
+			}
+			Pair<Integer[], BigFraction[][]> pair = solve(ia, newArrayRow, mapNum, system, numOfEle);
 			Integer[] mX = pair.getValueOne();
 			BigFraction[][] systemX = pair.getValueTwo();
 			int i = 0;
@@ -134,12 +157,12 @@ public class EquationBalancer{
 		return null;
 	}
 
-	public static Pair<Integer[], BigFraction[][]> solve(int newArrayRow, int mapNum, int[][] system, int numOfEle){
+	public static Pair<Integer[], BigFraction[][]> solve(Integer[] randomY, int newArrayRow, int mapNum, int[][] system, int numOfEle){
 
 		int[][] system2 = new int[newArrayRow][mapNum];
 		int[][] system3 = new int[newArrayRow][mapNum-1];
 
-		Pair<Integer[], int[][]> px = pickRandom(system, newArrayRow, mapNum);
+		Pair<Integer[], int[][]> px = pickRandom(randomY, system, newArrayRow, mapNum);
 		system2 = px.getValueTwo();
 
 		for(int i = 0; i<newArrayRow;i++){
@@ -190,10 +213,11 @@ public class EquationBalancer{
 		}
 
 		for(int i = 0; i<newArrayRow;i++){
-			for(int j = i; j<newArrayRow-i-1; j++){
+			for(int j = 0; j<newArrayRow-i; j++){
 				for(int k = 0; k<mapNum;k++){
-					system4[i+j+1][k] = system4[i+j+1][k].subtract(system4[i][k].multiply(
-							system4[i+j+1][j+1].divide(system4[i][j+1])));
+					System.out.println("i:" + i + "j:" + j + "---" + system4[i][j+1]);
+					system4[j+1][k] = system4[j+1][k].subtract(system4[i][k].multiply(
+							system4[j+1][j+1].divide(system4[i][j+1])));
 				}
 			}
 		}
@@ -270,17 +294,19 @@ public class EquationBalancer{
 		return new Pair<Integer[], BigFraction[][]>(px.getValueOne(), system4);
 	}
 
-	private static Pair<Integer[], int[][]> pickRandom(int[][] system, int newArrayRow, int mapNum){
-		Integer[] randomX = new Integer[newArrayRow - 1];
-		for(int i = 0; i < randomX.length; i++){
-			randomX[i] = i + 2;
+	private static Pair<Integer[], int[][]> pickRandom(Integer[] randomY, int[][] system, int newArrayRow, int mapNum){
+		if(randomY == null){
+			Integer[] randomX = new Integer[newArrayRow - 1];
+			for(int i = 0; i < randomX.length; i++){
+				randomX[i] = i + 2;
+			}
+			List<Integer> ia = Arrays.<Integer>asList(randomX);
+			Collections.shuffle(ia);
+			randomX = ia.toArray(randomX);
+			randomY = new Integer[newArrayRow];
+			System.arraycopy(randomX, 0, randomY, 1, randomX.length);
+			randomY[0] = 1;
 		}
-		List<Integer> ia = Arrays.<Integer>asList(randomX);
-		Collections.shuffle(ia);
-		randomX = ia.toArray(randomX);
-		Integer[] randomY = new Integer[newArrayRow];
-		System.arraycopy(randomX, 0, randomY, 1, randomX.length);
-		randomY[0] = 1;
 		int[][] system2 = new int[newArrayRow][mapNum];
 		for(int i = 0; i<newArrayRow;i++){
 			system2[i] = system[randomY[i]];
