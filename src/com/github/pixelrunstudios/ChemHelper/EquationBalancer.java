@@ -2,17 +2,19 @@ package com.github.pixelrunstudios.ChemHelper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class EquationBalancer{
 	public static void main(String[] args){
-		Set<Map<String, Integer>> in = new HashSet<Map<String, Integer>>();
+		List<Map<String, Integer>> in = new LinkedList<Map<String, Integer>>();
 		Map<String, Integer> map1 = new HashMap<String, Integer>();
 		map1.put("Fe", 1);
 		map1.put("Br", 3);
@@ -23,7 +25,7 @@ public class EquationBalancer{
 		map2.put("O", 4);
 		in.add(map2);
 
-		Set<Map<String, Integer>> out = new HashSet<Map<String, Integer>>();
+		List<Map<String, Integer>> out = new LinkedList<Map<String, Integer>>();
 		Map<String, Integer> map3 = new HashMap<String, Integer>();
 		map3.put("Fe", 2);
 		map3.put("S", 3);
@@ -37,7 +39,7 @@ public class EquationBalancer{
 	}
 
 	public static Pair<Map<Map<String, Integer>, Integer>, Map<Map<String, Integer>, Integer>>
-	balance(Set<Map<String, Integer>> in, Set<Map<String, Integer>> out){
+	balance(List<Map<String, Integer>> in, List<Map<String, Integer>> out){
 
 		BigFraction.setAutoSimplify(true);
 		/*
@@ -84,15 +86,15 @@ public class EquationBalancer{
 		int newArrayRow = numOfEle-(numOfEle-mapNum+1);
 
 
-		int counter = add(in, elements, system, 0);
-		add(out, elements, system, counter);
+		int counter = add(true, in, elements, system, 0);
+		add(false, out, elements, system, counter);
 		System.out.println("newArrayRow: "+newArrayRow);
 
-		BigFraction[] finale = new BigFraction[elements.size()];
-		boolean[] finalePut = new boolean[elements.size()];
+		BigFraction[] finale = new BigFraction[mapNum];
+		boolean[] finalePut = new boolean[mapNum];
 		finale[0] = new BigFraction(1, 1);
 		finalePut[0] = true;
-		boolean finalePutFull = false;
+		//boolean finalePutFull = false;
 
 		Set<Integer> set = new HashSet<Integer>();
 
@@ -122,7 +124,13 @@ public class EquationBalancer{
 			if(pair == null){
 				continue;
 			}
-			Integer[] mX = pair.getValueOne();
+			BigFraction[][] systemX = pair.getValueTwo();
+			int i = 0;
+			for(BigFraction[] sa : systemX){
+				finale[i+1] = sa[0];
+				i++;
+			}
+			/*Integer[] mX = pair.getValueOne();
 			BigFraction[][] systemX = pair.getValueTwo();
 			int i = 0;
 			BigFraction multiplicant = new BigFraction(1, 1);
@@ -136,12 +144,12 @@ public class EquationBalancer{
 				System.out.println("hax: " + mX[i]);
 				if(finalePut[mX[i]] == true && !mset){
 					mset = true;
-					multiplicant = finale[mX[i]].divide(sa[0]);
+					//multiplicant = finale[mX[i]].divide(sa[0]);
 				}
-				else{
-					finale[mX[i]] = sa[0].multiply(multiplicant);
-					finalePut[mX[i]] = true;
-				}
+				//else{
+				finale[mX[i]] = sa[0].multiply(multiplicant);
+				finalePut[mX[i]] = true;
+				//}
 				i++;
 			}
 			finalePutFull = true;
@@ -162,15 +170,62 @@ public class EquationBalancer{
 				System.out.print(bf + " ");
 			}
 			System.out.println();
-			System.out.println(finaleCounter);
+			System.out.println(finaleCounter);*/
 		}
-		int i = 0;
 		for(BigFraction bf : finale){
 			System.out.println("----" + bf);
-			i++;
 		}
-		//TODO
-		return null;
+		int finDenProd = 1;
+		for(BigFraction bf : finale){
+			finDenProd *= bf.getDenominator();
+		}
+		for(int i = 0; i < finale.length; i++){
+			finale[i] = finale[i].multiply(new BigFraction(finDenProd, 1));
+		}
+		for(BigFraction bf : finale){
+			System.out.println("----" + bf);
+		}
+		int[] finalOutOne = new int[finale.length];
+		for(int i = 0; i < finale.length; i++){
+			finalOutOne[i] = (int) finale[i].getNumerator();
+		}
+		int gcdX = gcd(finalOutOne);
+		for(int i = 0; i < finale.length; i++){
+			finalOutOne[i] = finalOutOne[i] / gcdX;
+		}
+		for(int i : finalOutOne){
+			System.out.println("----" + i);
+		}
+		int finalOutX = 0;
+		Map<Map<String, Integer>, Integer> mapOfIn = new HashMap<Map<String, Integer>, Integer>();
+		for(Map<String, Integer> map : in){
+			mapOfIn.put(map, finalOutOne[finalOutX]);
+			finalOutX++;
+		}
+		Map<Map<String, Integer>, Integer> mapOfOut = new HashMap<Map<String, Integer>, Integer>();
+		for(Map<String, Integer> map : out){
+			mapOfOut.put(map, finalOutOne[finalOutX]);
+			finalOutX++;
+		}
+		return new Pair<Map<Map<String, Integer>, Integer>,
+				Map<Map<String, Integer>, Integer>>(mapOfIn, mapOfOut);
+	}
+
+	private static int gcd(int a, int b){
+		while(b > 0){
+			int tmp = b;
+			b = a % b;
+			a = tmp;
+		}
+		return a;
+	}
+
+	private static int gcd(int[] ia){
+		int r = ia[0];
+		for(int i = 1; i < ia.length; i++){
+			r = gcd(r, ia[i]);
+		}
+		return r;
 	}
 
 	public static Pair<Integer[], BigFraction[][]> solve(Integer[] randomY, int newArrayRow, int mapNum, int[][] system, int numOfEle){
@@ -381,7 +436,7 @@ public class EquationBalancer{
 		return new Pair<Integer[], int[][]>(outX, system2);
 	}
 
-	public static int add(Set<Map<String, Integer>> mapSet, ArrayList<String> elements, int[][] system, int initCounter){
+	public static int add(boolean b, Collection<Map<String, Integer>> mapSet, ArrayList<String> elements, int[][] system, int initCounter){
 		int counter = initCounter;
 		for(Map<String, Integer> map : mapSet){
 			for(Map.Entry<String, Integer> entry : map.entrySet()){
@@ -391,7 +446,7 @@ public class EquationBalancer{
 						temp = i;
 					}
 				}
-				system[temp][counter] = entry.getValue();
+				system[temp][counter] = counter != 0 && b ? -entry.getValue() : entry.getValue();
 			}
 
 			counter++;

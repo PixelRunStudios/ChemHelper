@@ -2,6 +2,8 @@ package com.github.pixelrunstudios.ChemHelper;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 public class ParseCompound{
@@ -197,8 +199,11 @@ public class ParseCompound{
 	Map<Map<String, Integer>, Integer>> balance(
 			Map<Map<String, Integer>, Integer> inX,
 			Map<Map<String, Integer>, Integer> outX){
-		// TODO Auto-generated method stub
-		return null;
+		List<Map<String, Integer>> ino = new LinkedList<Map<String, Integer>>();
+		List<Map<String, Integer>> outo = new LinkedList<Map<String, Integer>>();
+		ino.addAll(inX.keySet());
+		outo.addAll(outX.keySet());
+		return EquationBalancer.balance(ino, outo);
 	}
 
 	private static boolean balanced(Map<Map<String, Integer>, Integer> inX,
