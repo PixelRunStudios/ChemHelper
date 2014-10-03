@@ -95,9 +95,9 @@ public class EquationBalancer{
 		System.out.println("newArrayRow: "+newArrayRow);
 
 		BigFraction[] finale = new BigFraction[mapNum];
-		boolean[] finalePut = new boolean[mapNum];
+		//boolean[] finalePut = new boolean[mapNum];
 		finale[0] = new BigFraction(1, 1);
-		finalePut[0] = true;
+		//finalePut[0] = true;
 		//boolean finalePutFull = false;
 
 		Set<Integer> set = new HashSet<Integer>();
@@ -109,10 +109,7 @@ public class EquationBalancer{
 		Set<Set<Integer>> is = SubsetHelper.subsets(set);
 		Set<Set<Integer>> ins = new HashSet<Set<Integer>>();
 		for(Set<Integer> s : is){
-			if(!(s.size() == newArrayRow) || !s.contains(1)){
-
-			}
-			else{
+			if(!(!(s.size() == newArrayRow) || !s.contains(1))){
 				System.out.println(s);
 				ins.add(s);
 			}
@@ -198,7 +195,7 @@ public class EquationBalancer{
 			finalOutOne[i] = finalOutOne[i] / gcdX;
 		}
 		for(int i : finalOutOne){
-			System.out.println("----" + i);
+			System.out.println("------  " + i);
 		}
 		int finalOutX = 0;
 		Map<Map<String, Integer>, Integer> mapOfIn = new HashMap<Map<String, Integer>, Integer>();
