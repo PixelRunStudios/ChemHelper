@@ -5,7 +5,7 @@ import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.IOException;
+import java.util.Map;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -31,6 +31,9 @@ public class MainGUI extends JFrame{
 	private JTextField outSub;
 	private JTextField inSub;
 	private JLabel result;
+	private JTextField inB;
+	private JTextField outB;
+	private JLabel coeff;
 
 	/**
 	 * Launch the application.
@@ -55,7 +58,7 @@ public class MainGUI extends JFrame{
 	 */
 	public MainGUI(){
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 450, 400);
+		setBounds(100, 100, 450, 600);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -111,6 +114,79 @@ public class MainGUI extends JFrame{
 			}
 		});
 		btnGo.setBounds(249, 30, 54, 29);
+
+		JPanel panel_10 = new JPanel();
+		panel_10.setBorder(new TitledBorder(null, "Equation Balancing", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		contentPane.add(panel_10);
+		panel_10.setLayout(new BoxLayout(panel_10, BoxLayout.Y_AXIS));
+
+		JPanel panel_11 = new JPanel();
+		panel_10.add(panel_11);
+
+		JLabel label_2 = new JLabel("Equation:");
+		panel_11.add(label_2);
+
+		inB = new JTextField("H2 + O2");
+		inB.setColumns(10);
+		panel_11.add(inB);
+
+		JLabel label_3 = new JLabel("->");
+		panel_11.add(label_3);
+
+		outB = new JTextField("H2O");
+		outB.setColumns(10);
+		panel_11.add(outB);
+
+		JPanel panel_13 = new JPanel();
+		panel_10.add(panel_13);
+
+		JLabel lblResult_1 = new JLabel("Coefficients:");
+		panel_13.add(lblResult_1);
+
+		coeff = new JLabel("");
+		panel_13.add(coeff);
+
+		JPanel panel_12 = new JPanel();
+		panel_10.add(panel_12);
+
+		JButton btnGo_2 = new JButton("Go");
+		btnGo_2.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try{
+					Pair<Map<Map<String, Integer>, Integer>,
+					Map<Map<String, Integer>, Integer>> pair = ParseCompound.parseEquation(inB.getText(), outB.getText());
+					String out = "";
+					boolean first = true;
+					for(Integer i : pair.getValueOne().values()){
+						if(first){
+							first = false;
+						}
+						else{
+							out += ", ";
+						}
+						out += i;
+					}
+					out += "; ";
+					first = true;
+					for(Integer i : pair.getValueTwo().values()){
+						if(first){
+							first = false;
+						}
+						else{
+							out += ", ";
+						}
+						out += i;
+					}
+					coeff.setText(out);
+				}
+				catch(Exception e1){
+					e1.printStackTrace();
+					coeff.setText("Error!");
+				}
+			}
+		});
+		panel_12.add(btnGo_2);
 
 		JPanel panel_2 = new JPanel();
 		panel_2.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null), "Stoichiometry", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
@@ -201,9 +277,10 @@ public class MainGUI extends JFrame{
 							FileToMap.readMapFromFile(new File("elements.txt")));
 					result.setText(String.valueOf(out));
 				}
-				catch(NumberFormatException | IOException e1){
+				catch(Exception e1){
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
+					coeff.setText("Error!");
 				}
 			}
 		});
