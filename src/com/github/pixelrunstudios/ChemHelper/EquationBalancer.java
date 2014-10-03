@@ -26,6 +26,8 @@ public class EquationBalancer{
 		map2.put("O", 4);
 		in.add(map2);
 
+		System.out.println(in);
+
 		List<Map<String, Integer>> out = new LinkedList<Map<String, Integer>>();
 		Map<String, Integer> map3 = new LinkedHashMap<String, Integer>();
 		map3.put("Fe", 2);
@@ -36,6 +38,7 @@ public class EquationBalancer{
 		map4.put("H", 1);
 		map4.put("Br", 1);
 		out.add(map4);
+		System.out.println(out);
 		balance(in,out);
 	}
 
@@ -65,7 +68,7 @@ public class EquationBalancer{
 			for(Map.Entry<String, Integer> entry : map.entrySet()){
 				boolean yesEle = false;
 				for(int i = 0; i<elements.size();i++){
-					if(elements.get(i) == entry.getKey()){
+					if(elements.get(i).equals(entry.getKey())){
 						yesEle = true;
 						break;
 					}
@@ -443,7 +446,7 @@ public class EquationBalancer{
 			for(Map.Entry<String, Integer> entry : map.entrySet()){
 				int temp = 0;
 				for(int i = 0; i<elements.size();i++){
-					if(elements.get(i) == entry.getKey()){
+					if(elements.get(i).equals(entry.getKey())){
 						temp = i;
 					}
 				}
