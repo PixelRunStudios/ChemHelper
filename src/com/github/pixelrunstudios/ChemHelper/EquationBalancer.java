@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -15,23 +16,23 @@ import java.util.Set;
 public class EquationBalancer{
 	public static void main(String[] args){
 		List<Map<String, Integer>> in = new LinkedList<Map<String, Integer>>();
-		Map<String, Integer> map1 = new HashMap<String, Integer>();
+		Map<String, Integer> map1 = new LinkedHashMap<String, Integer>();
 		map1.put("Fe", 1);
 		map1.put("Br", 3);
 		in.add(map1);
-		Map<String, Integer> map2 = new HashMap<String, Integer>();
+		Map<String, Integer> map2 = new LinkedHashMap<String, Integer>();
 		map2.put("H", 2);
 		map2.put("S", 1);
 		map2.put("O", 4);
 		in.add(map2);
 
 		List<Map<String, Integer>> out = new LinkedList<Map<String, Integer>>();
-		Map<String, Integer> map3 = new HashMap<String, Integer>();
+		Map<String, Integer> map3 = new LinkedHashMap<String, Integer>();
 		map3.put("Fe", 2);
 		map3.put("S", 3);
 		map3.put("O", 12);
 		out.add(map3);
-		Map<String, Integer> map4 = new HashMap<String, Integer>();
+		Map<String, Integer> map4 = new LinkedHashMap<String, Integer>();
 		map4.put("H", 1);
 		map4.put("Br", 1);
 		out.add(map4);
@@ -46,7 +47,7 @@ public class EquationBalancer{
 		 * Complexity of thing
 		 *
 		 */
-		//{Fe=1,Br=3}, {H=2,S=1,O=4} -> {Fe=2,S=3,O=12} + {H=2,Br=1}
+		//{Fe=1,Br=3}, {H=2,S=1,O=4} -> {Fe=2,S=3,O=12} + {H=1,Br=1}
 		//
 		//    Map1    Map2     Map3        Map4
 		// Br   3       0        0           1

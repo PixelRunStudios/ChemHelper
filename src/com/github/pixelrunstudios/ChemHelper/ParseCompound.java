@@ -1,6 +1,5 @@
 package com.github.pixelrunstudios.ChemHelper;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -160,7 +159,7 @@ public class ParseCompound{
 	public static Map<Map<String, Integer>, Integer>
 	parseExpression(String in){
 		Map<Map<String, Integer>, Integer> map =
-				new HashMap<Map<String, Integer>, Integer>();
+				new LinkedHashMap<Map<String, Integer>, Integer>();
 		in = in.replace(" ", "");
 		String[] sa = in.split("\\+");
 		for(String s : sa){
@@ -202,13 +201,15 @@ public class ParseCompound{
 		List<Map<String, Integer>> ino = new LinkedList<Map<String, Integer>>();
 		List<Map<String, Integer>> outo = new LinkedList<Map<String, Integer>>();
 		ino.addAll(inX.keySet());
+		System.out.println(ino);
 		outo.addAll(outX.keySet());
+		System.out.println(outo);
 		return EquationBalancer.balance(ino, outo);
 	}
 
 	private static boolean balanced(Map<Map<String, Integer>, Integer> inX,
 			Map<Map<String, Integer>, Integer> outX){
 		// TODO Auto-generated method stub
-		return true;
+		return false;
 	}
 }
