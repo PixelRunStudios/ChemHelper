@@ -5,7 +5,6 @@ import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.util.Map;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -102,7 +101,7 @@ public class MainGUI extends JFrame{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try{
-					label.setText(String.valueOf(MolarMass.calculateExpression(
+					label.setText(String.valueOf(MolarMass.calculate(
 							ParseCompound.parseExpression(textField.getText())
 							, FileToMap.readMapFromFile(new File("elements.txt")))));
 				}
@@ -154,30 +153,9 @@ public class MainGUI extends JFrame{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try{
-					Pair<Map<Map<String, Integer>, Integer>,
-					Map<Map<String, Integer>, Integer>> pair = ParseCompound.parseEquation(inB.getText(), outB.getText());
-					String out = "";
-					boolean first = true;
-					for(Integer i : pair.getValueOne().values()){
-						if(first){
-							first = false;
-						}
-						else{
-							out += ", ";
-						}
-						out += i;
-					}
-					out += "; ";
-					first = true;
-					for(Integer i : pair.getValueTwo().values()){
-						if(first){
-							first = false;
-						}
-						else{
-							out += ", ";
-						}
-						out += i;
-					}
+					Pair<ChemistryUnit, ChemistryUnit> pair =
+							ParseCompound.parseEquation(inB.getText(), outB.getText());
+					String out = pair.getValueOne() + " -> " + pair.getValueTwo();
 					coeff.setText(out);
 				}
 				catch(Exception e1){

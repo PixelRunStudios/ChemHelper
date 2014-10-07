@@ -54,4 +54,23 @@ public class Pair<T, S> implements Serializable{
 	public int hashCode(){
 		return getValueOne().hashCode() ^ getValueTwo().hashCode(); //<< 8 ^ HIGH_MASK ^ getValueTwo().hashCode() >> 8 ^ LOW_MASK;
 	}
+
+	/**
+	 * Creates a new Pair with the given values
+	 * @param v1 the value of the first item
+	 * @param v2 the value of the second item
+	 * @return a new Pair with the given values
+	 */
+	public static <T, S> Pair<T, S> make(T v1, S v2){
+		return new Pair<T, S>(v1, v2);
+	}
+
+	/**
+	 * Creates a new Pair with the same values as the given Pair
+	 * @param original the Pair to obtain values from
+	 * @return a new Pair with the same values as the given Pair
+	 */
+	public static <T, S> Pair<T, S> make(Pair<T, S> pair){
+		return new Pair<T, S>(pair);
+	}
 }

@@ -1,12 +1,11 @@
 package com.github.pixelrunstudios.ChemHelper;
 
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 public class ParseCompound{
-	public static LinkedHashMap<String, Integer> parseCompound(String compound){
+	public static ChemistryUnit parseCompound(String compound){
 		if(findNest(compound, Integer.MIN_VALUE, false).getValueOne() != 0){
 			throw new IllegalArgumentException("For input string: " + compound);
 		}
@@ -14,8 +13,8 @@ public class ParseCompound{
 				afterParen = false, firstInParen = false, firstAfterParen = false;
 		String tempElement = "";
 		String tempNumber = "";
-		LinkedHashMap<String,Integer> elements = new LinkedHashMap<String,Integer>();
-		LinkedHashMap<String,Integer> elementsInParen = new LinkedHashMap<String,Integer>();
+		ChemistryUnit elements = new ChemistryUnit();
+		ChemistryUnit elementsInParen = new ChemistryUnit();
 		for(int i = 0; i<compound.length();i++){
 			char cati = compound.charAt(i);
 			boolean parenEnd = cati == ')';
@@ -37,18 +36,18 @@ public class ParseCompound{
 					inNumber = false;
 					tempNumber = tempNumber == "" ? "1" : tempNumber;
 					if(parenEnd || inf || !firstAfterParen){
-						LinkedHashMap<String, Integer> eleTemp;
+						ChemistryUnit eleTemp;
 						if(parenEnd || inf){
 							eleTemp = elementsInParen;
 						}
 						else{
 							eleTemp = elements;
 						}
-						if(eleTemp.containsKey(tempElement)){
-							tempNumber = Integer.toString(eleTemp.get(tempElement)+Integer.parseInt(tempNumber));
+						if(eleTemp.containsUnitKey(ChemistryUnit.mk(tempElement))){
+							tempNumber = Integer.toString(eleTemp.getUnit(ChemistryUnit.mk(tempElement))+Integer.parseInt(tempNumber));
 						}
 						if(!tempElement.equals("")){
-							eleTemp.put(tempElement, Integer.parseInt(tempNumber));
+							eleTemp.putUnit(ChemistryUnit.mk(tempElement), Integer.parseInt(tempNumber));
 						}
 						firstInParen = false;
 					}
@@ -93,11 +92,11 @@ public class ParseCompound{
 		if(afterParen){
 			inParenToElements(elements, elementsInParen, tempNumber);
 		}
-		if(elements.containsKey(tempElement)){
-			tempNumber = Integer.toString(elements.get(tempElement)+Integer.parseInt(tempNumber));
+		if(elements.containsUnitKey(ChemistryUnit.mk(tempElement))){
+			tempNumber = Integer.toString(elements.getUnit(ChemistryUnit.mk(tempElement))+Integer.parseInt(tempNumber));
 		}
 		if(!tempElement.equals("")){
-			elements.put(tempElement, Integer.parseInt(tempNumber));
+			elements.putUnit(ChemistryUnit.mk(tempElement), Integer.parseInt(tempNumber));
 		}
 		return elements;
 	}
@@ -131,35 +130,37 @@ public class ParseCompound{
 		return new Pair<Integer, Integer>(nest, lastFound);
 	}
 
-	private static void add(LinkedHashMap<String, Integer> elementsInParen,
-			LinkedHashMap<String, Integer> parseCompound){
-		for(Map.Entry<String, Integer> entry : parseCompound.entrySet()){
-			if(elementsInParen.containsKey(entry.getKey())){
-				elementsInParen.put(entry.getKey(), elementsInParen.get(entry.getKey()) + entry.getValue());
+	private static void add(ChemistryUnit elementsInParen,
+			ChemistryUnit parseCompound){
+		for(Map.Entry<ChemistryUnit, Integer> entry : parseCompound.getSubUnits().entrySet()){
+			if(elementsInParen.containsUnitKey(entry.getKey())){
+				elementsInParen.putUnit(entry.getKey(), elementsInParen.getUnit(entry.getKey()) + entry.getValue());
 			}
 			else{
-				elementsInParen.put(entry.getKey(), entry.getValue());
+				elementsInParen.putUnit(entry.getKey(), entry.getValue());
 			}
 		}
 	}
 
-	private static void inParenToElements(LinkedHashMap<String, Integer> elements,
-			LinkedHashMap<String, Integer> elementsInParen, String tempNumber){
-		for(Map.Entry<String, Integer> entry : elementsInParen.entrySet()){
-			String key = entry.getKey();
-			int value = entry.getValue() * Integer.parseInt(tempNumber);
-			if(elements.containsKey(key)){
-				value += elements.get(key);
-			}
-			elements.put(key, value);
+	private static void inParenToElements(ChemistryUnit elements,
+			ChemistryUnit elementsInParen, String tempNumber){
+		Integer i = Integer.parseInt(tempNumber);
+		/*for(Map.Entry<ChemistryUnit, Integer> ix : elementsInParen.getSubUnits().entrySet()){
+			elementsInParen.putUnit(ix.getKey(), ix.getValue() * i);
 		}
-		elementsInParen.clear();
+		elements.putAllUnits(elementsInParen.getSubUnits());*/
+		if(elementsInParen.unitSize() == 0 && elementsInParen.getName() == null){
+			System.out.println("po");
+
+			return;
+		}
+		elements.putUnit(elementsInParen, i);
+		//elementsInParen.clearUnit();
 	}
 
-	public static Map<Map<String, Integer>, Integer>
+	public static ChemistryUnit
 	parseExpression(String in){
-		Map<Map<String, Integer>, Integer> map =
-				new LinkedHashMap<Map<String, Integer>, Integer>();
+		ChemistryUnit unit = new ChemistryUnit();
 		in = in.replace(" ", "");
 		String[] sa = in.split("\\+");
 		for(String s : sa){
@@ -175,22 +176,24 @@ public class ParseCompound{
 			}
 			int n = Integer.parseInt(tempNumber);
 			if(n > 0){
-				map.put(parseCompound(s.substring(counter)), n);
+				unit.putUnit(parseCompound(s.substring(counter)), n);
 			}
 		}
-		return map;
+		return unit;
 	}
 
-	public static Pair<Map<Map<String, Integer>, Integer>, Map<Map<String, Integer>, Integer>>
+	public static Pair<ChemistryUnit, ChemistryUnit>
 	parseEquation(String in, String out){
-		Map<Map<String, Integer>, Integer> inX = parseExpression(in);
-		Map<Map<String, Integer>, Integer> outX = parseExpression(out);
+		ChemistryUnit inX = parseExpression(in);
+		ChemistryUnit outX = parseExpression(out);
 		if(balanced(inX, outX)){
-			return new Pair<Map<Map<String, Integer>, Integer>,
-					Map<Map<String, Integer>, Integer>>(inX, outX);
+			return new Pair<ChemistryUnit,
+					ChemistryUnit>(inX, outX);
 		}
 		else{
-			return balance(inX, outX);
+			return new Pair<ChemistryUnit,
+					ChemistryUnit>(inX, outX);
+			//return balance(inX, outX);
 		}
 	}
 
@@ -207,9 +210,9 @@ public class ParseCompound{
 		return EquationBalancer.balance(ino, outo);
 	}
 
-	private static boolean balanced(Map<Map<String, Integer>, Integer> inX,
-			Map<Map<String, Integer>, Integer> outX){
+	private static boolean balanced(ChemistryUnit inX,
+			ChemistryUnit outX){
 		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 }
