@@ -2,7 +2,6 @@ package com.github.pixelrunstudios.ChemHelper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -39,11 +38,11 @@ public class EquationBalancer{
 		map4.put("Br", 1);
 		out.add(map4);
 		System.out.println(out);
-		balance(in,out);
+		//balance(in,out);
 	}
 
-	public static Pair<Map<Map<String, Integer>, Integer>, Map<Map<String, Integer>, Integer>>
-	balance(List<Map<String, Integer>> in, List<Map<String, Integer>> out){
+	public static Pair<ChemistryUnit, ChemistryUnit>
+	balance(ChemistryUnit inX, ChemistryUnit outX){
 
 		BigFraction.setAutoSimplify(true);
 		/*
@@ -61,11 +60,11 @@ public class EquationBalancer{
 		//
 		// Final: 2, 3, 1, 6
 
-		ArrayList<String> elements = new ArrayList<String>();
+		ArrayList<ChemistryUnit> elements = new ArrayList<ChemistryUnit>();
 		int mapNum = 0;
 		int numOfEle = 0;
-		for(Map<String, Integer> map : in){
-			for(Map.Entry<String, Integer> entry : map.entrySet()){
+		for(Map.Entry<ChemistryUnit, Integer> map : inX.getSubUnits().entrySet()){
+			for(Map.Entry<ChemistryUnit, Integer> entry : map.getKey().getSubUnits().entrySet()){
 				boolean yesEle = false;
 				for(int i = 0; i<elements.size();i++){
 					if(elements.get(i).equals(entry.getKey())){
@@ -83,15 +82,15 @@ public class EquationBalancer{
 			System.out.println(elements.get(i));
 		}
 		System.out.println();
-		mapNum = in.size() + out.size();
+		mapNum = inX.getSubUnits().size() + outX.getSubUnits().size();
 		numOfEle = elements.size();
 		System.out.println(numOfEle + " " + mapNum);
 		int[][] system = new int[numOfEle][mapNum];
 		int newArrayRow = numOfEle-(numOfEle-mapNum+1);
 
 
-		int counter = add(true, in, elements, system, 0);
-		add(false, out, elements, system, counter);
+		int counter = add(true, inX, elements, system, 0);
+		add(false, outX, elements, system, counter);
 		System.out.println("newArrayRow: "+newArrayRow);
 
 		BigFraction[] finale = new BigFraction[mapNum];
@@ -198,18 +197,20 @@ public class EquationBalancer{
 			System.out.println("------  " + i);
 		}
 		int finalOutX = 0;
-		Map<Map<String, Integer>, Integer> mapOfIn = new HashMap<Map<String, Integer>, Integer>();
-		for(Map<String, Integer> map : in){
-			mapOfIn.put(map, finalOutOne[finalOutX]);
+		Map<ChemistryUnit, Integer> mapOfIn = new HashMap<ChemistryUnit, Integer>();
+		for(Map.Entry<ChemistryUnit, Integer> map : inX.getSubUnits().entrySet()){
+			mapOfIn.put(map.getKey(), finalOutOne[finalOutX]);
 			finalOutX++;
 		}
-		Map<Map<String, Integer>, Integer> mapOfOut = new HashMap<Map<String, Integer>, Integer>();
-		for(Map<String, Integer> map : out){
-			mapOfOut.put(map, finalOutOne[finalOutX]);
+		Map<ChemistryUnit, Integer> mapOfOut = new HashMap<ChemistryUnit, Integer>();
+		for(Map.Entry<ChemistryUnit, Integer> map : outX.getSubUnits().entrySet()){
+			mapOfOut.put(map.getKey(), finalOutOne[finalOutX]);
 			finalOutX++;
 		}
-		return new Pair<Map<Map<String, Integer>, Integer>,
-				Map<Map<String, Integer>, Integer>>(mapOfIn, mapOfOut);
+		ChemistryUnit inRet = ChemistryUnit.mk(mapOfIn);
+		ChemistryUnit outRet = ChemistryUnit.mk(mapOfOut);
+		return new Pair<ChemistryUnit,
+				ChemistryUnit>(inRet, outRet);
 	}
 
 	private static int gcd(int a, int b){
@@ -437,10 +438,10 @@ public class EquationBalancer{
 		return new Pair<Integer[], int[][]>(outX, system2);
 	}
 
-	public static int add(boolean b, Collection<Map<String, Integer>> mapSet, ArrayList<String> elements, int[][] system, int initCounter){
+	public static int add(boolean b, ChemistryUnit inX, ArrayList<ChemistryUnit> elements, int[][] system, int initCounter){
 		int counter = initCounter;
-		for(Map<String, Integer> map : mapSet){
-			for(Map.Entry<String, Integer> entry : map.entrySet()){
+		for(Map.Entry<ChemistryUnit, Integer> map : inX.getSubUnits().entrySet()){
+			for(Map.Entry<ChemistryUnit, Integer> entry : map.getKey().getSubUnits().entrySet()){
 				int temp = 0;
 				for(int i = 0; i<elements.size();i++){
 					if(elements.get(i).equals(entry.getKey())){

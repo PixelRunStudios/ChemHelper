@@ -1,7 +1,5 @@
 package com.github.pixelrunstudios.ChemHelper;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 public class ParseCompound{
@@ -191,28 +189,19 @@ public class ParseCompound{
 					ChemistryUnit>(inX, outX);
 		}
 		else{
-			return new Pair<ChemistryUnit,
-					ChemistryUnit>(inX, outX);
-			//return balance(inX, outX);
+			return balance(inX, outX);
 		}
 	}
 
-	private static Pair<Map<Map<String, Integer>, Integer>,
-	Map<Map<String, Integer>, Integer>> balance(
-			Map<Map<String, Integer>, Integer> inX,
-			Map<Map<String, Integer>, Integer> outX){
-		List<Map<String, Integer>> ino = new LinkedList<Map<String, Integer>>();
-		List<Map<String, Integer>> outo = new LinkedList<Map<String, Integer>>();
-		ino.addAll(inX.keySet());
-		System.out.println(ino);
-		outo.addAll(outX.keySet());
-		System.out.println(outo);
-		return EquationBalancer.balance(ino, outo);
+	private static Pair<ChemistryUnit, ChemistryUnit> balance(
+			ChemistryUnit inX,
+			ChemistryUnit outX){
+		return EquationBalancer.balance(inX, outX);
 	}
 
 	private static boolean balanced(ChemistryUnit inX,
 			ChemistryUnit outX){
 		// TODO Auto-generated method stub
-		return true;
+		return false;
 	}
 }
