@@ -93,9 +93,23 @@ public class EquationBalancer{
 	public static Pair<ChemistryUnit, ChemistryUnit>
 	balance(ChemistryUnit inX, ChemistryUnit outX, boolean apart){
 
+
+
 		if(apart){
-			inX = apart(inX);
-			outX = apart(outX);
+			ChemistryUnit inNewX = new ChemistryUnit();
+			for(Map.Entry<ChemistryUnit, Integer> cur : inX.getUnits().entrySet()){
+
+				ChemistryUnit cnr = apart(cur.getKey());
+				inNewX.putUnit(cnr, cur.getValue());
+			}
+			inX = inNewX;
+			ChemistryUnit outNewX = new ChemistryUnit();
+			for(Map.Entry<ChemistryUnit, Integer> cur : outX.getUnits().entrySet()){
+
+				ChemistryUnit cnr = apart(cur.getKey());
+				outNewX.putUnit(cnr, cur.getValue());
+			}
+			outX = outNewX;
 		}
 
 		BigFraction.setAutoSimplify(true);
@@ -232,13 +246,13 @@ public class EquationBalancer{
 		int finDenProd = 1;
 		for(BigFraction bf : finale){
 			if(bf == null){
-				//if(apart){
-				return null;
-				//}
-				//else{
-				//println("ModeSwitch");
-				//	return balance(inX, outX, true);
-				//}
+				if(apart){
+					return null;
+				}
+				else{
+					println("ModeSwitch");
+					return balance(inX, outX, true);
+				}
 			}
 			finDenProd *= bf.getDenominator();
 		}
@@ -276,13 +290,15 @@ public class EquationBalancer{
 				ChemistryUnit>(inRet, outRet);
 	}
 
-	protected static ChemistryUnit apart(ChemistryUnit inX){
+	/*protected static ChemistryUnit apart(ChemistryUnit inX){
 		ChemistryUnit inNew = new ChemistryUnit();
-		return apart(inX, inNew).getValueOne();
-	}
+		ChemistryUnit cn = apart(inX, inNew).getValueOne();
+		System.out.println(cn);
+		return cn;
+	}*/
 
 
-	private static Pair<ChemistryUnit, Boolean> apart(ChemistryUnit inX, ChemistryUnit inNew){
+	/*private static Pair<ChemistryUnit, Boolean> apart(ChemistryUnit inX, ChemistryUnit inNew){
 		if(inX.getType() == ChemistryUnit.TYPE_BASE){
 			return Pair.make(inX, true);
 		}
@@ -290,12 +306,58 @@ public class EquationBalancer{
 			for(Map.Entry<ChemistryUnit, Integer> pair : inX.getUnits().entrySet()){
 				Pair<ChemistryUnit, Boolean> pcb = apart(pair.getKey(), inNew);
 				ChemistryUnit v1 = pcb.getValueOne();
-				if(v1.getType() == ChemistryUnit.TYPE_BASE){
-					inNew.putUnit(v1, pair.getValue());
+				if(pcb.getValueTwo()){
+					if(inNew.containsUnitKey(v1)){
+						inNew.putUnit(v1, inNew.getUnit(v1) + pair.getValue());
+					}
+					else{
+						inNew.putUnit(v1, pair.getValue());
+					}
+				}
+				else{
+					for(Map.Entry<ChemistryUnit, Integer> cu :
+						v1.getUnits().entrySet()){
+						v1.putUnit(cu.getKey(), cu.getValue() * pair.getValue());
+					}
 				}
 			}
 			return Pair.make(inNew, false);
 		}
+	}*/
+
+	public static ChemistryUnit apart(ChemistryUnit inZ){
+
+		/*for(Map.Entry<String, Integer> entry : inZ.entrySet()){
+			mass += Double.parseDouble(data.get(entry.getKey().toLowerCase()+"_atomic-mass"))*entry.getValue();
+		}*/
+		if(inZ.getType() == ChemistryUnit.TYPE_BASE){
+			return inZ;
+		}
+		ChemistryUnit valOut = new ChemistryUnit();
+		for(Map.Entry<ChemistryUnit, Integer> unit : inZ.getUnits().entrySet()){
+			ChemistryUnit val = new ChemistryUnit();
+			ChemistryUnit x = apart(unit.getKey());
+			if(x.getType() == ChemistryUnit.TYPE_BASE){
+				val.putUnit(x, 1);
+			}
+			else{
+				for(Map.Entry<ChemistryUnit, Integer> xZero : x.getUnits().entrySet()){
+					ChemistryUnit xKey = xZero.getKey();
+					if(val.containsUnitKey(xKey)){
+						val.putUnit(xKey, x.getUnit(xKey) + xZero.getValue());
+					}
+					else{
+						val.putUnit(xKey, xZero.getValue());
+					}
+				}
+			}
+			for(Map.Entry<ChemistryUnit, Integer> un : val.getUnits().entrySet()){
+				ChemistryUnit unKey = un.getKey();
+				valOut.putUnit(unKey, val.getUnit(unKey) * unit.getValue());
+			}
+		}
+
+		return valOut;
 	}
 
 	private static int gcd(int a, int b){
