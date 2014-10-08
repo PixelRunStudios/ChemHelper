@@ -12,6 +12,27 @@ import java.util.Map;
 import java.util.Set;
 
 public class EquationBalancer{
+
+	private static final boolean DEBUG = true;
+
+	public static void print(Object o){
+		if(DEBUG){
+			System.out.print(o);
+		}
+	}
+
+	public static void println(Object o){
+		if(DEBUG){
+			System.out.println(o);
+		}
+	}
+
+	public static void println(){
+		if(DEBUG){
+			System.out.println();
+		}
+	}
+
 	public static void main(String[] args){
 
 		/*Map<ChemistryUnit, Integer> map1 = new LinkedHashMap<ChemistryUnit, Integer>();
@@ -25,7 +46,7 @@ public class EquationBalancer{
 		ChemistryUnit c2 = ChemistryUnit.mk(map2);
 		ChemistryUnit in = ChemistryUnit.mk(Pair.make(c1, 1), Pair.make(c2, 1));
 
-		System.out.println(in);
+		println(in);
 
 		Map<ChemistryUnit, Integer> map3 = new LinkedHashMap<ChemistryUnit, Integer>();
 		map3.put(ChemistryUnit.mk("Fe"), 2);
@@ -37,7 +58,7 @@ public class EquationBalancer{
 		map4.put(ChemistryUnit.mk("Br"), 1);
 		ChemistryUnit c4 = ChemistryUnit.mk(map4);
 		ChemistryUnit out = ChemistryUnit.mk(Pair.make(c3, 1), Pair.make(c4, 1));
-		System.out.println(out);*/
+		println(out);*/
 
 		Map<ChemistryUnit, Integer> map1 = new LinkedHashMap<ChemistryUnit, Integer>();
 		map1.put(ChemistryUnit.mk("C"), 8);
@@ -48,7 +69,7 @@ public class EquationBalancer{
 		ChemistryUnit c2 = ChemistryUnit.mk(map2);
 		ChemistryUnit in = ChemistryUnit.mk(Pair.make(c1, 1), Pair.make(c2, 1));
 
-		System.out.println(in);
+		println(in);
 
 		Map<ChemistryUnit, Integer> map3 = new LinkedHashMap<ChemistryUnit, Integer>();
 		map3.put(ChemistryUnit.mk("H"), 2);
@@ -59,7 +80,7 @@ public class EquationBalancer{
 		map4.put(ChemistryUnit.mk("O"), 2);
 		ChemistryUnit c4 = ChemistryUnit.mk(map4);
 		ChemistryUnit out = ChemistryUnit.mk(Pair.make(c3, 1), Pair.make(c4, 1));
-		System.out.println(out);
+		println(out);
 
 		balance(in,out);
 	}
@@ -106,25 +127,25 @@ public class EquationBalancer{
 					}
 				}
 				if(!yesEle){
-					System.out.println("hi");
+					println("hi");
 					elements.add(entry.getKey());
 				}
 			}
 		}
 		for(int i = 0; i<elements.size();i++){
-			System.out.println(elements.get(i));
+			println(elements.get(i));
 		}
-		System.out.println();
+		println();
 		mapNum = inX.getSubUnits().size() + outX.getSubUnits().size();
 		numOfEle = elements.size();
-		System.out.println(numOfEle + " " + mapNum);
+		println(numOfEle + " " + mapNum);
 		int[][] system = new int[numOfEle][mapNum];
 		int newArrayRow = numOfEle-(numOfEle-mapNum+1);
 
 
 		int counter = add(true, inX, elements, system, 0);
 		add(false, outX, elements, system, counter);
-		System.out.println("newArrayRow: "+newArrayRow);
+		println("newArrayRow: "+newArrayRow);
 
 		BigFraction[] finale = new BigFraction[mapNum];
 		//boolean[] finalePut = new boolean[mapNum];
@@ -142,7 +163,7 @@ public class EquationBalancer{
 		Set<Set<Integer>> ins = new HashSet<Set<Integer>>();
 		for(Set<Integer> s : is){
 			if(!(!(s.size() == newArrayRow) || !s.contains(1))){
-				System.out.println(s);
+				println(s);
 				ins.add(s);
 			}
 		}
@@ -174,7 +195,7 @@ public class EquationBalancer{
 					i++;
 					continue;
 				}
-				System.out.println("hax: " + mX[i]);
+				println("hax: " + mX[i]);
 				if(finalePut[mX[i]] == true && !mset){
 					mset = true;
 					//multiplicant = finale[mX[i]].divide(sa[0]);
@@ -196,17 +217,17 @@ public class EquationBalancer{
 				}
 			}
 
-			System.out.println("WHoos");
+			println("WHoos");
 
-			System.out.print("HO ");
+			print("HO ");
 			for(BigFraction bf : finale){
-				System.out.print(bf + " ");
+				print(bf + " ");
 			}
-			System.out.println();
-			System.out.println(finaleCounter);*/
+			println();
+			println(finaleCounter);*/
 		}
 		for(BigFraction bf : finale){
-			System.out.println("----" + bf);
+			println("----" + bf);
 		}
 		int finDenProd = 1;
 		for(BigFraction bf : finale){
@@ -215,7 +236,7 @@ public class EquationBalancer{
 				return null;
 				//}
 				//else{
-				//System.out.println("ModeSwitch");
+				//println("ModeSwitch");
 				//	return balance(inX, outX, true);
 				//}
 			}
@@ -225,7 +246,7 @@ public class EquationBalancer{
 			finale[i] = finale[i].multiply(new BigFraction(finDenProd, 1));
 		}
 		for(BigFraction bf : finale){
-			System.out.println("----" + bf);
+			println("----" + bf);
 		}
 		int[] finalOutOne = new int[finale.length];
 		for(int i = 0; i < finale.length; i++){
@@ -236,7 +257,7 @@ public class EquationBalancer{
 			finalOutOne[i] = finalOutOne[i] / gcdX;
 		}
 		for(int i : finalOutOne){
-			System.out.println("------  " + i);
+			println("------  " + i);
 		}
 		int finalOutX = 0;
 		Map<ChemistryUnit, Integer> mapOfIn = new HashMap<ChemistryUnit, Integer>();
@@ -365,7 +386,7 @@ public class EquationBalancer{
 
 		/*
 		for(List<Integer> li : sli){
-			System.out.println("SLI" + li);
+			println("SLI" + li);
 			for(int i = 0; i < target.length; i++){
 				target[i] = -1;
 			}
@@ -373,11 +394,11 @@ public class EquationBalancer{
 			superFor: for(int i : li){
 				outerFor: for(int j = 0; j<mapNum-1;j++){
 					if(system3[i][j] != 0){
-						//System.out.println("Ar:" + numOfNonZero[i][0]);
+						//println("Ar:" + numOfNonZero[i][0]);
 						for(int x = 0; x < system3[i].length; x++){
-							//System.out.print("o:" + system3[numOfNonZero[i][0]][x] + " ");
+							//print("o:" + system3[numOfNonZero[i][0]][x] + " ");
 						}
-						//System.out.println("I:" + i + "J:" + j + "---" + system3[numOfNonZero[i][0]][j]);
+						//println("I:" + i + "J:" + j + "---" + system3[numOfNonZero[i][0]][j]);
 						for(int k = 0; k<mapNum-1;k++){
 							if(target[k] == i){
 								continue outerFor;
@@ -390,9 +411,9 @@ public class EquationBalancer{
 			}
 
 			for(int i : target){
-				System.out.print("aa" + i + " ");
+				print("aa" + i + " ");
 			}
-			System.out.println();
+			println();
 			boolean fail = false;
 			for(int i = 0; i < target.length; i++){
 				if(target[i] == -1){
@@ -413,37 +434,37 @@ public class EquationBalancer{
 		BigFraction[][] system4 = new BigFraction[newArrayRow][mapNum];
 		for(int i = 0; i<newArrayRow;i++){
 			for(int j = 0; j<mapNum;j++){
-				System.out.print(system2[i][j] + " ");
+				print(system2[i][j] + " ");
 				system4[i][j] = new BigFraction(system2[target[i]][j], 1);
 			}
-			System.out.println();
+			println();
 		}
 		for(int i = 0;i<newArrayRow;i++){
 			for(int j = 0; j<mapNum;j++){
-				System.out.print(system4[i][j] + " ");
+				print(system4[i][j] + " ");
 			}
-			System.out.println();
+			println();
 		}
 
 		for(int i = 0; i<newArrayRow;i++){
 			for(int j = i+1; j<newArrayRow; j++){
 				BigFraction temp = system4[j][i+1];
 				for(int k = 0; k<mapNum;k++){
-					//System.out.println("i:" + i + "j:" + j + "---" + system4[i][i+1]);
+					//println("i:" + i + "j:" + j + "---" + system4[i][i+1]);
 					system4[j][k] = system4[j][k].subtract(temp.multiply(
 							system4[i][k].divide(system4[i][i+1])));
 				}
 			}
 		}
-		System.out.println();
+		println();
 		for(int i = 0;i<newArrayRow;i++){
 			for(int j = 0; j<mapNum;j++){
-				System.out.print(system4[i][j] + " ");
+				print(system4[i][j] + " ");
 			}
-			System.out.println();
+			println();
 		}
 
-		System.out.println();
+		println();
 		int counter2 = 0;
 		for(int i = newArrayRow-1; i>=0;i--){
 			system4[i][0] = system4[i][0].divide(system4[i][mapNum-1-counter2]);
@@ -456,15 +477,15 @@ public class EquationBalancer{
 
 		}
 
-		System.out.println();
+		println();
 		for(int i = 0;i<newArrayRow;i++){
 			for(int j = 0; j<mapNum;j++){
-				System.out.print(system4[i][j] + " ");
+				print(system4[i][j] + " ");
 			}
-			System.out.println();
+			println();
 		}
 
-		System.out.println();
+		println();
 
 		check(newArrayRow, mapNum, target, system3);
 
@@ -474,47 +495,47 @@ public class EquationBalancer{
 		int i = 0;
 		for(Integer inx : iax){
 			outIax[target[i]] = inx;
-			System.out.println(inx);
+			println(inx);
 			i++;
 		}
 		for(Integer inx : outIax){
 
-			System.out.println(inx);
+			println(inx);
 		}
 
 		/*for(int i = 0;i<numOfEle;i++){
-			System.out.print(elements.get(i)+" ");
+			print(elements.get(i)+" ");
 			for(int j = 0; j<mapNum;j++){
-				System.out.print(system[i][j] + " ");
+				print(system[i][j] + " ");
 			}
-			System.out.println();
+			println();
 		}
-		System.out.println();
+		println();
 		for(int i = 0;i<newArrayRow;i++){
 			for(int j = 0; j<mapNum;j++){
-				System.out.print(system2[i][j] + " ");
+				print(system2[i][j] + " ");
 			}
-			System.out.println();
+			println();
 		}
-		System.out.println();
+		println();
 		for(int i = 0;i<newArrayRow;i++){
 			for(int j = 0; j<mapNum-1;j++){
-				System.out.print(system3[i][j] + " ");
+				print(system3[i][j] + " ");
 			}
-			System.out.println();
+			println();
 		}
-		System.out.println();
+		println();
 		for(int i = 0;i<mapNum-1;i++){
 			for(int j = 0; j<2;j++){
-				System.out.print(numOfNonZero[i][j] + " ");
+				print(numOfNonZero[i][j] + " ");
 			}
-			System.out.println();
+			println();
 		}
-		System.out.println();
+		println();
 		for(int i = 0; i<mapNum-1;i++){
-			System.out.print(target[i] + " ");
+			print(target[i] + " ");
 		}
-		System.out.println();*/
+		println();*/
 		//TODO
 		return new Pair<Integer[], BigFraction[][]>(outIax, system4);
 	}
@@ -532,7 +553,7 @@ public class EquationBalancer{
 			System.arraycopy(randomX, 0, randomY, 1, randomX.length);
 			randomY[0] = 1;
 		}
-		System.out.println(Arrays.asList(randomY));
+		println(Arrays.asList(randomY));
 		int[][] system2 = new int[newArrayRow][mapNum];
 		for(int i = 0; i<newArrayRow;i++){
 			system2[i] = system[randomY[i]];
@@ -598,11 +619,11 @@ public class EquationBalancer{
 	private static void printArray(int[][] arr){
 		for(int[] ia : arr){
 			for(int i : ia){
-				System.out.print(i + " ");
+				print(i + " ");
 			}
-			System.out.println();
+			println();
 		}
-		System.out.println();
+		println();
 	}
 
 	public static class EquationComparator implements Comparator<int[]>{
