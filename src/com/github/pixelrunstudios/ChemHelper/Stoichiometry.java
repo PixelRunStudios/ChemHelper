@@ -10,6 +10,10 @@ public class Stoichiometry{
 		// TODO Auto-generated method stub
 		Pair<ChemistryUnit, ChemistryUnit> iao = ParseCompound.
 				parseEquation(inEq, outEq);
+		if(iao == null){
+			//System.out.println("N/A");
+			throw new IllegalArgumentException("Cannot be converted!");
+		}
 		ChemistryUnit in = iao.getValueOne();
 		ChemistryUnit out = iao.getValueTwo();
 		ChemistryUnit inZ = ParseCompound.parseCompound(inSub);
@@ -18,8 +22,8 @@ public class Stoichiometry{
 		int outNum = 0;
 		Pair<Boolean, Integer> inp = huntDown(in, inZ, outZ);
 		if(inp.getValueTwo() < 0){
-			System.out.println("N/A");
-			return 0;
+			//System.out.println("N/A");
+			throw new IllegalArgumentException("Cannot be converted!");
 		}
 		else{
 			if(inp.getValueOne()){

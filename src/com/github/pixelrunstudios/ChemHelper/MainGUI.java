@@ -156,9 +156,14 @@ public class MainGUI extends JFrame{
 				try{
 					Pair<ChemistryUnit, ChemistryUnit> pair =
 							ParseCompound.parseEquation(inB.getText(), outB.getText());
-					String out = ParseCompound.expressionToString(pair.getValueOne()) + " -> " +
-							ParseCompound.expressionToString(pair.getValueTwo());
-					coeff.setText(out);
+					if(pair == null){
+						coeff.setText("Equation cannot be balanced!");
+					}
+					else{
+						String out = ParseCompound.expressionToString(pair.getValueOne()) + " -> " +
+								ParseCompound.expressionToString(pair.getValueTwo());
+						coeff.setText(out);
+					}
 				}
 				catch(Exception e1){
 					e1.printStackTrace();
@@ -260,7 +265,7 @@ public class MainGUI extends JFrame{
 				catch(Exception e1){
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
-					coeff.setText("Error!");
+					result.setText("Error!");
 				}
 			}
 		});

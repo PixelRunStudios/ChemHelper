@@ -336,6 +336,8 @@ public class EquationBalancer{
 				return balance(inX, outX, true);
 			}
 		}
+		println(inRet);
+		println(outRet);
 		return new Pair<ChemistryUnit,
 				ChemistryUnit>(inRet, outRet);
 	}
@@ -571,8 +573,13 @@ public class EquationBalancer{
 					BigFraction temp = system4[j][i+1];
 					for(int k = 0; k<mapNum;k++){
 						//println("i:" + i + "j:" + j + "---" + system4[i][i+1]);
-						system4[j][k] = system4[j][k].subtract(temp.multiply(
-								system4[i][k].divide(system4[i][i+1])));
+						try{
+							system4[j][k] = system4[j][k].subtract(temp.multiply(
+									system4[i][k].divide(system4[i][i+1])));
+						}
+						catch(ArithmeticException e){
+							continue megaFor;
+						}
 					}
 				}
 			}
@@ -776,7 +783,7 @@ public class EquationBalancer{
 				throw new IllegalArgumentException("Illegal in - separation!");
 			}
 			if(!outZ.containsUnitKey(inKey) || outZ.getUnit(inKey) != inZero.getValue()){
-				println(inKey + ";;" + outZ.getUnit(inKey) + ";;" + inZero.getValue());
+				println(inKey + ":" + outZ.getUnit(inKey) + ":" + inZero.getValue());
 				println("Not Balanced! 01");
 				return false;
 			}
