@@ -1,13 +1,13 @@
 package com.github.pixelrunstudios.ChemHelper;
 
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 public class ChemistryUnit implements Comparable<ChemistryUnit>{
 
 	private Map<ChemistryUnit, Integer> units =
-			new TreeMap<ChemistryUnit, Integer>();
+			new LinkedHashMap<ChemistryUnit, Integer>();
 
 	//For base
 	protected String name;
@@ -77,6 +77,10 @@ public class ChemistryUnit implements Comparable<ChemistryUnit>{
 		return Collections.unmodifiableMap(units);
 	}
 
+	protected Map<ChemistryUnit, Integer> getUnits(){
+		return units;
+	}
+
 	public boolean hasSubUnits(){
 		return getSubUnits().size() > 0;
 	}
@@ -109,10 +113,10 @@ public class ChemistryUnit implements Comparable<ChemistryUnit>{
 	public boolean equals(Object o){
 		if(o instanceof ChemistryUnit){
 			ChemistryUnit cu = (ChemistryUnit) o;
-			if(getType() == TYPE_NEST && cu.getSubUnits().equals(getSubUnits())){
+			if(getType() == TYPE_NEST && cu.getType() == TYPE_NEST && cu.getSubUnits().equals(getSubUnits())){
 				return true;
 			}
-			if(getType() == TYPE_BASE && cu.getName().equals(getName())){
+			if(getType() == TYPE_BASE && cu.getType() == TYPE_BASE && cu.getName().equals(getName())){
 				return true;
 			}
 		}
@@ -130,7 +134,7 @@ public class ChemistryUnit implements Comparable<ChemistryUnit>{
 		throw new IllegalStateException("Illegal type");
 	}
 
-	public void putAllUnits(Map<ChemistryUnit, Integer> subUnits){
+	protected void putAllUnits(Map<ChemistryUnit, Integer> subUnits){
 		for(Map.Entry<ChemistryUnit, Integer> unit : subUnits.entrySet()){
 			putUnit(unit.getKey(), unit.getValue());
 		}

@@ -66,6 +66,16 @@ public class EquationBalancer{
 
 	public static Pair<ChemistryUnit, ChemistryUnit>
 	balance(ChemistryUnit inX, ChemistryUnit outX){
+		return balance(inX, outX, false);
+	}
+
+	public static Pair<ChemistryUnit, ChemistryUnit>
+	balance(ChemistryUnit inX, ChemistryUnit outX, boolean apart){
+
+		if(apart){
+			inX = apart(inX);
+			outX = apart(outX);
+		}
 
 		BigFraction.setAutoSimplify(true);
 		/*
@@ -86,8 +96,8 @@ public class EquationBalancer{
 		ArrayList<ChemistryUnit> elements = new ArrayList<ChemistryUnit>();
 		int mapNum = 0;
 		int numOfEle = 0;
-		for(Map.Entry<ChemistryUnit, Integer> map : inX.getSubUnits().entrySet()){
-			for(Map.Entry<ChemistryUnit, Integer> entry : map.getKey().getSubUnits().entrySet()){
+		for(Map.Entry<ChemistryUnit, Integer> map : inX.getUnits().entrySet()){
+			for(Map.Entry<ChemistryUnit, Integer> entry : map.getKey().getUnits().entrySet()){
 				boolean yesEle = false;
 				for(int i = 0; i<elements.size();i++){
 					if(elements.get(i).equals(entry.getKey())){
@@ -200,6 +210,15 @@ public class EquationBalancer{
 		}
 		int finDenProd = 1;
 		for(BigFraction bf : finale){
+			if(bf == null){
+				//if(apart){
+				return null;
+				//}
+				//else{
+				//System.out.println("ModeSwitch");
+				//	return balance(inX, outX, true);
+				//}
+			}
 			finDenProd *= bf.getDenominator();
 		}
 		for(int i = 0; i < finale.length; i++){
@@ -221,12 +240,12 @@ public class EquationBalancer{
 		}
 		int finalOutX = 0;
 		Map<ChemistryUnit, Integer> mapOfIn = new HashMap<ChemistryUnit, Integer>();
-		for(Map.Entry<ChemistryUnit, Integer> map : inX.getSubUnits().entrySet()){
+		for(Map.Entry<ChemistryUnit, Integer> map : inX.getUnits().entrySet()){
 			mapOfIn.put(map.getKey(), finalOutOne[finalOutX]);
 			finalOutX++;
 		}
 		Map<ChemistryUnit, Integer> mapOfOut = new HashMap<ChemistryUnit, Integer>();
-		for(Map.Entry<ChemistryUnit, Integer> map : outX.getSubUnits().entrySet()){
+		for(Map.Entry<ChemistryUnit, Integer> map : outX.getUnits().entrySet()){
 			mapOfOut.put(map.getKey(), finalOutOne[finalOutX]);
 			finalOutX++;
 		}
@@ -234,6 +253,28 @@ public class EquationBalancer{
 		ChemistryUnit outRet = ChemistryUnit.mk(mapOfOut);
 		return new Pair<ChemistryUnit,
 				ChemistryUnit>(inRet, outRet);
+	}
+
+	protected static ChemistryUnit apart(ChemistryUnit inX){
+		ChemistryUnit inNew = new ChemistryUnit();
+		return apart(inX, inNew).getValueOne();
+	}
+
+
+	private static Pair<ChemistryUnit, Boolean> apart(ChemistryUnit inX, ChemistryUnit inNew){
+		if(inX.getType() == ChemistryUnit.TYPE_BASE){
+			return Pair.make(inX, true);
+		}
+		else{
+			for(Map.Entry<ChemistryUnit, Integer> pair : inX.getUnits().entrySet()){
+				Pair<ChemistryUnit, Boolean> pcb = apart(pair.getKey(), inNew);
+				ChemistryUnit v1 = pcb.getValueOne();
+				if(v1.getType() == ChemistryUnit.TYPE_BASE){
+					inNew.putUnit(v1, pair.getValue());
+				}
+			}
+			return Pair.make(inNew, false);
+		}
 	}
 
 	private static int gcd(int a, int b){
@@ -503,8 +544,8 @@ public class EquationBalancer{
 
 	public static int add(boolean b, ChemistryUnit inX, ArrayList<ChemistryUnit> elements, int[][] system, int initCounter){
 		int counter = initCounter;
-		for(Map.Entry<ChemistryUnit, Integer> map : inX.getSubUnits().entrySet()){
-			for(Map.Entry<ChemistryUnit, Integer> entry : map.getKey().getSubUnits().entrySet()){
+		for(Map.Entry<ChemistryUnit, Integer> map : inX.getUnits().entrySet()){
+			for(Map.Entry<ChemistryUnit, Integer> entry : map.getKey().getUnits().entrySet()){
 				int temp = 0;
 				for(int i = 0; i<elements.size();i++){
 					if(elements.get(i).equals(entry.getKey())){
