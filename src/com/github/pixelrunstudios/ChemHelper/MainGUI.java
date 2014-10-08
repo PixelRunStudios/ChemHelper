@@ -125,14 +125,14 @@ public class MainGUI extends JFrame{
 		JLabel label_2 = new JLabel("Equation:");
 		panel_11.add(label_2);
 
-		inB = new JTextField("H2 + O2");
+		inB = new JTextField("C8H18 + O2");
 		inB.setColumns(10);
 		panel_11.add(inB);
 
 		JLabel label_3 = new JLabel("->");
 		panel_11.add(label_3);
 
-		outB = new JTextField("H2O");
+		outB = new JTextField("CO2 + H2O");
 		outB.setColumns(10);
 		panel_11.add(outB);
 

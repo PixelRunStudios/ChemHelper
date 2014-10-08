@@ -151,11 +151,11 @@ public class ChemistryUnit implements Comparable<ChemistryUnit>{
 			return getName();
 		}
 		else{
-			int count = 0;
+			//int count = 0;
 			String build = "";
 			for(Map.Entry<ChemistryUnit, Integer> x : units.entrySet()){
 				build += x.getKey().toString() + (x.getValue() <= 1 ? "" : x.getValue());
-				count++;
+				//count++;
 			}
 			//if(count != 1){
 			build = "(" + build + ")";
