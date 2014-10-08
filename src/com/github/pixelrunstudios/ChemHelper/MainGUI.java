@@ -56,6 +56,7 @@ public class MainGUI extends JFrame{
 	 * Create the frame.
 	 */
 	public MainGUI(){
+		setTitle("ChemHelper");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 600);
 		contentPane = new JPanel();
@@ -155,7 +156,8 @@ public class MainGUI extends JFrame{
 				try{
 					Pair<ChemistryUnit, ChemistryUnit> pair =
 							ParseCompound.parseEquation(inB.getText(), outB.getText());
-					String out = pair.getValueOne() + " -> " + pair.getValueTwo();
+					String out = ParseCompound.expressionToString(pair.getValueOne()) + " -> " +
+							ParseCompound.expressionToString(pair.getValueTwo());
 					coeff.setText(out);
 				}
 				catch(Exception e1){

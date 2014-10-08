@@ -326,6 +326,16 @@ public class EquationBalancer{
 		}
 		ChemistryUnit inRet = ChemistryUnit.mk(mapOfIn);
 		ChemistryUnit outRet = ChemistryUnit.mk(mapOfOut);
+		if(!balanced(inRet, outRet)){
+			println("Balance failure");
+			if(apart){
+				return null;
+			}
+			else{
+				println("ModeSwitch");
+				return balance(inX, outX, true);
+			}
+		}
 		return new Pair<ChemistryUnit,
 				ChemistryUnit>(inRet, outRet);
 	}
@@ -333,7 +343,7 @@ public class EquationBalancer{
 	/*protected static ChemistryUnit apart(ChemistryUnit inX){
 		ChemistryUnit inNew = new ChemistryUnit();
 		ChemistryUnit cn = apart(inX, inNew).getValueOne();
-		System.out.println(cn);
+		println(cn);
 		return cn;
 	}*/
 
@@ -393,7 +403,12 @@ public class EquationBalancer{
 			}
 			for(Map.Entry<ChemistryUnit, Integer> un : val.getUnits().entrySet()){
 				ChemistryUnit unKey = un.getKey();
-				valOut.putUnit(unKey, val.getUnit(unKey) * unit.getValue());
+				if(valOut.containsUnitKey(unKey)){
+					valOut.putUnit(unKey, valOut.getUnit(unKey) + val.getUnit(unKey) * unit.getValue());
+				}
+				else{
+					valOut.putUnit(unKey, val.getUnit(unKey) * unit.getValue());
+				}
 			}
 		}
 
@@ -746,5 +761,34 @@ public class EquationBalancer{
 			return Integer.compare(o1[1], o2[1]);
 		}
 
+	}
+
+	public static boolean balanced(ChemistryUnit inX, ChemistryUnit outX){
+		ChemistryUnit inZ = apart(inX);
+		ChemistryUnit outZ = apart(outX);
+		for(Map.Entry<ChemistryUnit, Integer> outZero : outZ.getUnits().entrySet()){
+			System.out.println(outZero);
+		}
+		for(Map.Entry<ChemistryUnit, Integer> inZero : inZ.getUnits().entrySet()){
+			System.out.println(inZero);
+			ChemistryUnit inKey = inZero.getKey();
+			if(inKey.getType() == ChemistryUnit.TYPE_NEST){
+				throw new IllegalArgumentException("Illegal in - separation!");
+			}
+			if(!outZ.containsUnitKey(inKey) || outZ.getUnit(inKey) != inZero.getValue()){
+				println(inKey + ";;" + outZ.getUnit(inKey) + ";;" + inZero.getValue());
+				println("Not Balanced! 01");
+				return false;
+			}
+		}
+		for(Map.Entry<ChemistryUnit, Integer> outZero : outZ.getUnits().entrySet()){
+			ChemistryUnit inKey = outZero.getKey();
+			if(!outZ.containsUnitKey(inKey)){
+				println("Not Balanced! 02");
+				return false;
+			}
+		}
+		println("Balanced!");
+		return true;
 	}
 }

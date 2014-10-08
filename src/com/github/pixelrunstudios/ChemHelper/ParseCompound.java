@@ -201,7 +201,26 @@ public class ParseCompound{
 
 	private static boolean balanced(ChemistryUnit inX,
 			ChemistryUnit outX){
-		// TODO Auto-generated method stub
-		return false;
+		return EquationBalancer.balanced(inX, outX);
+	}
+
+	public static String expressionToString(ChemistryUnit v1){
+		if(v1.getType() == ChemistryUnit.TYPE_BASE){
+			return v1.getName();
+		}
+		else{
+			boolean first = true;
+			String build = "";
+			for(Map.Entry<ChemistryUnit, Integer> x : v1.getUnits().entrySet()){
+				if(first){
+					first = false;
+				}
+				else{
+					build += " + ";
+				}
+				build += (x.getValue() <= 1 ? "" : x.getValue()) + x.getKey().toString();
+			}
+			return build;
+		}
 	}
 }
