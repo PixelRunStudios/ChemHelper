@@ -113,10 +113,6 @@ public class EquationBalancer{
 			outX = outNewX;
 		}
 
-		/*
-		 * Complexity of thing
-		 *
-		 */
 		//{Fe=1,Br=3}, {H=2,S=1,O=4} -> {Fe=2,S=3,O=12} + {H=1,Br=1}
 		//
 		//    Map1    Map2     Map3        Map4
@@ -127,6 +123,15 @@ public class EquationBalancer{
 		// O    0       4        12          0
 		//
 		// Final: 2, 3, 1, 6
+
+		//{C=8,H=18}, {O=2} -> {H=2,O=1} + {C=1,O=2}
+		//
+		//    Map1    Map2       Map3        Map4
+		// C    8       0          0           1
+		// H    18      0          2           0
+		// O    0       2          1           2
+		//
+		// Final: 2, 25, 18, 16
 
 		ArrayList<ChemistryUnit> elements = new ArrayList<ChemistryUnit>();
 		int mapNum = 0;
@@ -782,7 +787,7 @@ public class EquationBalancer{
 			if(inKey.getType() == ChemistryUnit.TYPE_NEST){
 				throw new IllegalArgumentException("Illegal in - separation!");
 			}
-			if(!outZ.containsUnitKey(inKey) || outZ.getUnit(inKey) != inZero.getValue()){
+			if(!outZ.containsUnitKey(inKey) || !outZ.getUnit(inKey).equals(inZero.getValue())){
 				println(inKey + ":" + outZ.getUnit(inKey) + ":" + inZero.getValue());
 				println("Not Balanced! 01");
 				return false;
