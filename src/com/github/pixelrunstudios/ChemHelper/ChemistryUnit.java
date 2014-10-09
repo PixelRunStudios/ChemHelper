@@ -3,6 +3,7 @@ package com.github.pixelrunstudios.ChemHelper;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class ChemistryUnit implements Comparable<ChemistryUnit>{
 
@@ -44,7 +45,7 @@ public class ChemistryUnit implements Comparable<ChemistryUnit>{
 		units.clear();
 	}
 
-	public ChemistryUnit(Pair<ChemistryUnit, Integer>[] data){
+	private ChemistryUnit(Pair<ChemistryUnit, Integer>[] data){
 		for(Pair<ChemistryUnit, Integer> p : data){
 			units.put(p.getValueOne(), p.getValueTwo());
 		}
@@ -81,13 +82,23 @@ public class ChemistryUnit implements Comparable<ChemistryUnit>{
 		return units;
 	}
 
+	protected Set<Map.Entry<ChemistryUnit, Integer>>
+	getUnitEntrySet(){
+		return getUnits().entrySet();
+	}
+
+	public Set<Map.Entry<ChemistryUnit, Integer>>
+	getSubUnitEntrySet(){
+		return Collections.unmodifiableSet(getUnits().entrySet());
+	}
+
 	public boolean hasSubUnits(){
 		return getSubUnits().size() > 0;
 	}
 
 	public static ChemistryUnit mk(String name){
 		if(name == null){
-			System.out.println("aaaar");
+			Debug.printlnDeep("aaaar");
 			return null;
 		}
 		return new ChemistryUnit(name);
@@ -155,15 +166,11 @@ public class ChemistryUnit implements Comparable<ChemistryUnit>{
 			return getName();
 		}
 		else{
-			//int count = 0;
 			String build = "";
 			for(Map.Entry<ChemistryUnit, Integer> x : units.entrySet()){
 				build += x.getKey().toString() + (x.getValue() <= 1 ? "" : x.getValue());
-				//count++;
 			}
-			//if(count != 1){
 			build = "(" + build + ")";
-			//}
 			return build;
 		}
 	}

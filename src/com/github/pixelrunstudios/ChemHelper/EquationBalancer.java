@@ -2,8 +2,6 @@ package com.github.pixelrunstudios.ChemHelper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -12,6 +10,10 @@ import java.util.Map;
 import java.util.Set;
 
 public class EquationBalancer{
+
+	private EquationBalancer(){
+		//Do nothing
+	}
 
 	public static void main(String[] args){
 
@@ -45,7 +47,7 @@ public class EquationBalancer{
 		map2.put(ChemistryUnit.mk("O"), 2);
 		ChemistryUnit c2 = ChemistryUnit.mk(map2);
 		ChemistryUnit in = ChemistryUnit.mk(Pair.make(c1, 1), Pair.make(c2, 1));
-		Debug.println(in);
+
 
 		Map<ChemistryUnit, Integer> map3 = new LinkedHashMap<ChemistryUnit, Integer>();
 		map3.put(ChemistryUnit.mk("H"), 2);
@@ -56,7 +58,7 @@ public class EquationBalancer{
 		map4.put(ChemistryUnit.mk("O"), 2);
 		ChemistryUnit c4 = ChemistryUnit.mk(map4);
 		ChemistryUnit out = ChemistryUnit.mk(Pair.make(c3, 1), Pair.make(c4, 1));
-		Debug.println(out);
+
 
 		balance(in,out);
 	}
@@ -66,512 +68,434 @@ public class EquationBalancer{
 		return balance(inX, outX, false);
 	}
 
-	public static Pair<ChemistryUnit, ChemistryUnit>
-	balance(ChemistryUnit inX, ChemistryUnit outX, boolean apart){
+	private static Pair<ChemistryUnit, ChemistryUnit>
+	balance(ChemistryUnit inExpression, ChemistryUnit outExpression, boolean apartMode){
 
-		BigFraction.setAutoSimplify(true);
-
-		if(apart){
-			ChemistryUnit inNewX = new ChemistryUnit();
-			for(Map.Entry<ChemistryUnit, Integer> cur : inX.getUnits().entrySet()){
-
-				ChemistryUnit cnr = apart(cur.getKey());
-				inNewX.putUnit(cnr, cur.getValue());
-			}
-			inX = inNewX;
-			ChemistryUnit outNewX = new ChemistryUnit();
-			for(Map.Entry<ChemistryUnit, Integer> cur : outX.getUnits().entrySet()){
-
-				ChemistryUnit cnr = apart(cur.getKey());
-				outNewX.putUnit(cnr, cur.getValue());
-			}
-			outX = outNewX;
-		}
-
-		ArrayList<ChemistryUnit> elements = new ArrayList<ChemistryUnit>();
-		int mapNum = 0;
-		int numOfEle = 0;
-		for(Map.Entry<ChemistryUnit, Integer> map : inX.getUnits().entrySet()){
-			for(Map.Entry<ChemistryUnit, Integer> entry : map.getKey().getUnits().entrySet()){
-				boolean yesEle = false;
-				for(int i = 0; i<elements.size();i++){
-					if(elements.get(i).equals(entry.getKey())){
-						yesEle = true;
-						break;
-					}
-				}
-				if(!yesEle){
-					Debug.printlnDeep("hi");
-					elements.add(entry.getKey());
-				}
-			}
-		}
-		for(Map.Entry<ChemistryUnit, Integer> map : outX.getUnits().entrySet()){
-			for(Map.Entry<ChemistryUnit, Integer> outEntry : map.getKey().getUnits().entrySet()){
-				if(!elements.contains(outEntry.getKey())){
-					if(apart){
-						return null;
-					}
-					else{
-						Debug.println("ModeSwitch");
-						return balance(inX, outX, true);
-					}
-				}
-			}
-		}
-		for(int i = 0; i<elements.size();i++){
-			Debug.print(elements.get(i) + " ");
-		}
 		Debug.println();
-		mapNum = inX.getSubUnits().size() + outX.getSubUnits().size();
-		numOfEle = elements.size();
-		Debug.println(numOfEle + " " + mapNum);
-		int[][] system = new int[numOfEle][mapNum];
-		int newArrayRow = numOfEle-(numOfEle-mapNum+1);
+		Debug.println("----Begin Balancing Equation----");
+		Debug.println();
+
+		Debug.println(inExpression);
+		Debug.println(outExpression);
+
+		/*
+		 * Nomenclature:
+		 *
+		 *
+		 * Equation: 2H2 + O2 -> 2H2O
+		 * Expression: 2H2 + O2
+		 * Unit: 2H2
+		 * UnitType: H
+		 */
+
+		regular: if(true){
+			BigFraction.setAutoSimplify(true);
+
+			if(apartMode){
+				ChemistryUnit apartUnitInExpression = new ChemistryUnit();
+				for(Map.Entry<ChemistryUnit, Integer> inUnit : inExpression.getUnitEntrySet()){
+					ChemistryUnit currentInUnit = apart(inUnit.getKey());
+					apartUnitInExpression.putUnit(currentInUnit, inUnit.getValue());
+				}
+				inExpression = apartUnitInExpression;
+				ChemistryUnit apartUnitOutExpression = new ChemistryUnit();
+				for(Map.Entry<ChemistryUnit, Integer> outUnit : outExpression.getUnitEntrySet()){
+					ChemistryUnit currentOutUnit = apart(outUnit.getKey());
+					apartUnitOutExpression.putUnit(currentOutUnit, outUnit.getValue());
+				}
+				outExpression = apartUnitOutExpression;
+			}
+
+			//Previously known as elements
+			ArrayList<ChemistryUnit> uniqueUnitTypes = new ArrayList<ChemistryUnit>();
+
+			for(Map.Entry<ChemistryUnit, Integer> inExpressionEntry : inExpression.getUnitEntrySet()){
+				for(Map.Entry<ChemistryUnit, Integer> inExpressionUnitEntry : inExpressionEntry.getKey().getUnitEntrySet()){
+					boolean yesEle = false;
+					for(int i = 0; i < uniqueUnitTypes.size();i++){
+						if(uniqueUnitTypes.get(i).equals(inExpressionUnitEntry.getKey())){
+							yesEle = true;
+							break;
+						}
+					}
+					if(!yesEle){
+						Debug.printlnDeep("hi");
+						uniqueUnitTypes.add(inExpressionUnitEntry.getKey());
+					}
+				}
+			}
+			for(Map.Entry<ChemistryUnit, Integer> map : outExpression.getUnitEntrySet()){
+				for(Map.Entry<ChemistryUnit, Integer> outEntry : map.getKey().getUnitEntrySet()){
+					if(!uniqueUnitTypes.contains(outEntry.getKey())){
+						break regular;
+					}
+				}
+			}
+
+			Debug.println();
+			Debug.print("Unique Unit Types: ");
+			ArrayPrinter.printArray(uniqueUnitTypes);
+
+			//Previously known as mapNum
+			int numOfUnits = inExpression.unitSize() + outExpression.unitSize();
+			//Previously known as numOfEle
+			int numOfUniqueUnitTypes = uniqueUnitTypes.size();
+
+			Debug.println("Unique Unit Types #: " + numOfUniqueUnitTypes);
+			Debug.println("Units #: " + numOfUnits);
+
+			//Previously known as system
+			int[][] originalMatrix = new int[numOfUniqueUnitTypes][numOfUnits];
+			//Replaced newArrayRow with numOfUnits - 1
+			//Previously known as newArrayRow
+			//int newMatrixRow = numOfUnits - 1;
+
+			int originalMatrixCounter = add(true, inExpression, uniqueUnitTypes, originalMatrix, 0);
+			add(false, outExpression, uniqueUnitTypes, originalMatrix, originalMatrixCounter);
+
+			//Previously known as finale
+			BigFraction[] balancedResult = new BigFraction[numOfUnits];
+			balancedResult[0] = new BigFraction(1, 1);
+
+			Set<Integer> rows = new HashSet<Integer>();
+
+			for(int i = 0; i < uniqueUnitTypes.size(); i++){
+				rows.add(i);
+			}
 
 
-		int counter = add(true, inX, elements, system, 0);
-		add(false, outX, elements, system, counter);
-		Debug.println("newArrayRow: "+newArrayRow);
+			Set<Set<Integer>> rowsSubset = SubsetHelper.subsets(rows);
+			Set<Set<Integer>> pickedRowCombinations = new HashSet<Set<Integer>>();
+			for(Set<Integer> s : rowsSubset){
+				if(!(!(s.size() == numOfUnits - 1) || !s.contains(1))){
+					Debug.println("Testing Subset: " + s);
+					pickedRowCombinations.add(s);
+				}
+			}
+			for(Set<Integer> pickedRowCombination : pickedRowCombinations){
+				Integer[] rowsPicked = new Integer[numOfUnits - 1];
+				int pickedRowCombinationI = 0;
+				for(Integer rowPicked : pickedRowCombination){
+					rowsPicked[pickedRowCombinationI] = rowPicked;
+					pickedRowCombinationI++;
+				}
+				Pair<Integer[], BigFraction[][]> solution = solve(rowsPicked, numOfUnits, originalMatrix, numOfUniqueUnitTypes);
+				if(solution == null){
+					continue;
+				}
+				BigFraction[][] systemX = solution.getValueTwo();
+				int systemXI = 0;
+				boolean noProblems = true;
+				for(BigFraction[] sa : systemX){
+					if(sa[0] == null || sa[0].compareTo(new BigFraction(0, 1)) <= 0){
+						noProblems = false;
+					}
+					balancedResult[systemXI + 1] = sa[0];
+					systemXI++;
+				}
+				if(noProblems){
+					break;
+				}
+			}
 
-		BigFraction[] finale = new BigFraction[mapNum];
-		finale[0] = new BigFraction(1, 1);
+			Debug.print("Balanced Result: ");
+			ArrayPrinter.printArray(balancedResult);
 
-		Set<Integer> set = new HashSet<Integer>();
+			int resultDenominatorProduct = 1;
+			for(BigFraction bf : balancedResult){
+				if(bf == null){
+					break regular;
+				}
+				resultDenominatorProduct *= bf.getDenominator();
+			}
+			for(int i = 0; i < balancedResult.length; i++){
+				balancedResult[i] = balancedResult[i].multiply(new BigFraction(resultDenominatorProduct, 1));
+			}
 
-		for(int i = 0; i < elements.size(); i++){
-			set.add(i);
-		}
+			Debug.print("Result Product:  ");
+			ArrayPrinter.printArray(balancedResult);
 
-		Set<Set<Integer>> is = SubsetHelper.subsets(set);
-		Set<Set<Integer>> ins = new HashSet<Set<Integer>>();
-		for(Set<Integer> s : is){
-			if(!(!(s.size() == newArrayRow) || !s.contains(1))){
-				Debug.println(s);
-				ins.add(s);
+			int[] finalResult = new int[balancedResult.length];
+			for(int i = 0; i < balancedResult.length; i++){
+				finalResult[i] = (int) balancedResult[i].getNumerator();
 			}
-		}
-		for(Set<Integer> s : ins){
-			Integer[] ia = new Integer[newArrayRow];
-			int ooo = 0;
-			for(Integer i : s){
-				ia[ooo] = i;
-				ooo++;
+			int gcdX = MathHelper.gcd(finalResult);
+			for(int i = 0; i < balancedResult.length; i++){
+				finalResult[i] = finalResult[i] / gcdX;
 			}
-			Pair<Integer[], BigFraction[][]> pair = solve(ia, newArrayRow, mapNum, system, numOfEle);
-			if(pair == null){
-				continue;
-			}
-			BigFraction[][] systemX = pair.getValueTwo();
-			int i = 0;
-			boolean win = true;
-			for(BigFraction[] sa : systemX){
-				if(sa[0] == null || sa[0].compareTo(new BigFraction(0, 1)) <= 0){
-					win = false;
+
+			Debug.print("Final Result:  ");
+			ArrayPrinter.printArray(finalResult);
+
+			Debug.println();
+			int finalResultI = 0;
+			Map<ChemistryUnit, Integer> mapOfIn = new HashMap<ChemistryUnit, Integer>();
+			for(Map.Entry<ChemistryUnit, Integer> map : inExpression.getUnitEntrySet()){
+				int finalResultOut = finalResult[finalResultI];
+				if(finalResultOut == 0){
+					break regular;
 				}
-				finale[i+1] = sa[0];
-				i++;
+				mapOfIn.put(map.getKey(), finalResultOut);
+				finalResultI++;
 			}
-			if(win){
-				break;
+			Map<ChemistryUnit, Integer> mapOfOut = new HashMap<ChemistryUnit, Integer>();
+			for(Map.Entry<ChemistryUnit, Integer> map : outExpression.getUnitEntrySet()){
+				int finalResultOut = finalResult[finalResultI];
+				if(finalResultOut == 0){
+					break regular;
+				}
+				mapOfOut.put(map.getKey(), finalResultOut);
+				finalResultI++;
 			}
-		}
-		for(BigFraction bf : finale){
-			Debug.println("----" + bf);
-		}
-		int finDenProd = 1;
-		for(BigFraction bf : finale){
-			if(bf == null){
-				if(apart){
-					return null;
-				}
-				else{
-					Debug.println("ModeSwitch");
-					return balance(inX, outX, true);
-				}
+			ChemistryUnit inResult = ChemistryUnit.mk(mapOfIn);
+			ChemistryUnit outResult = ChemistryUnit.mk(mapOfOut);
+			if(!balanced(inResult, outResult)){
+				Debug.println("Balance failure");
+				break regular;
 			}
-			finDenProd *= bf.getDenominator();
+			Debug.println(inResult);
+			Debug.println(outResult);
+			Debug.println();
+			Debug.println("----End Balancing Equation----");
+			return Pair.make(inResult, outResult);
 		}
-		for(int i = 0; i < finale.length; i++){
-			finale[i] = finale[i].multiply(new BigFraction(finDenProd, 1));
-		}
-		for(BigFraction bf : finale){
-			Debug.println("----" + bf);
-		}
-		int[] finalOutOne = new int[finale.length];
-		for(int i = 0; i < finale.length; i++){
-			finalOutOne[i] = (int) finale[i].getNumerator();
-		}
-		int gcdX = gcd(finalOutOne);
-		for(int i = 0; i < finale.length; i++){
-			finalOutOne[i] = finalOutOne[i] / gcdX;
-		}
-		for(int i : finalOutOne){
-			Debug.println("------  " + i);
-		}
-		int finalOutX = 0;
-		Map<ChemistryUnit, Integer> mapOfIn = new HashMap<ChemistryUnit, Integer>();
-		for(Map.Entry<ChemistryUnit, Integer> map : inX.getUnits().entrySet()){
-			int fOut = finalOutOne[finalOutX];
-			if(fOut == 0){
-				if(apart){
-					return null;
-				}
-				else{
-					Debug.println("ModeSwitch");
-					return balance(inX, outX, true);
-				}
-			}
-			mapOfIn.put(map.getKey(), fOut);
-			finalOutX++;
-		}
-		Map<ChemistryUnit, Integer> mapOfOut = new HashMap<ChemistryUnit, Integer>();
-		for(Map.Entry<ChemistryUnit, Integer> map : outX.getUnits().entrySet()){
-			int fOut = finalOutOne[finalOutX];
-			if(fOut == 0){
-				if(apart){
-					return null;
-				}
-				else{
-					Debug.println("ModeSwitch");
-					return balance(inX, outX, true);
-				}
-			}
-			mapOfOut.put(map.getKey(), fOut);
-			finalOutX++;
-		}
-		ChemistryUnit inRet = ChemistryUnit.mk(mapOfIn);
-		ChemistryUnit outRet = ChemistryUnit.mk(mapOfOut);
-		if(!balanced(inRet, outRet)){
-			Debug.println("Balance failure");
-			if(apart){
+		{
+			if(apartMode){
 				return null;
 			}
 			else{
 				Debug.println("ModeSwitch");
-				return balance(inX, outX, true);
+				return balance(inExpression, outExpression, true);
 			}
-		}
-		Debug.println(inRet);
-		Debug.println(outRet);
-		return new Pair<ChemistryUnit,
-				ChemistryUnit>(inRet, outRet);
-	}
+		}}
 
-	public static ChemistryUnit apart(ChemistryUnit inZ){
-		if(inZ.getType() == ChemistryUnit.TYPE_BASE){
-			return inZ;
+	private static ChemistryUnit apart(ChemistryUnit unit){
+		if(unit.getType() == ChemistryUnit.TYPE_BASE){
+			return unit;
 		}
-		ChemistryUnit valOut = new ChemistryUnit();
-		for(Map.Entry<ChemistryUnit, Integer> unit : inZ.getUnits().entrySet()){
-			ChemistryUnit val = new ChemistryUnit();
-			ChemistryUnit x = apart(unit.getKey());
-			if(x.getType() == ChemistryUnit.TYPE_BASE){
-				val.putUnit(x, 1);
+		ChemistryUnit unitValue = new ChemistryUnit();
+		for(Map.Entry<ChemistryUnit, Integer> unitPart : unit.getUnitEntrySet()){
+			ChemistryUnit unitPartValue = new ChemistryUnit();
+			ChemistryUnit unitPartApartValue = apart(unitPart.getKey());
+			if(unitPartApartValue.getType() == ChemistryUnit.TYPE_BASE){
+				unitPartValue.putUnit(unitPartApartValue, 1);
 			}
 			else{
-				for(Map.Entry<ChemistryUnit, Integer> xZero : x.getUnits().entrySet()){
+				for(Map.Entry<ChemistryUnit, Integer> xZero : unitPartApartValue.getUnitEntrySet()){
 					ChemistryUnit xKey = xZero.getKey();
-					if(val.containsUnitKey(xKey)){
-						val.putUnit(xKey, x.getUnit(xKey) + xZero.getValue());
+					if(unitPartValue.containsUnitKey(xKey)){
+						unitPartValue.putUnit(xKey, unitPartApartValue.getUnit(xKey) + xZero.getValue());
 					}
 					else{
-						val.putUnit(xKey, xZero.getValue());
+						unitPartValue.putUnit(xKey, xZero.getValue());
 					}
 				}
 			}
-			for(Map.Entry<ChemistryUnit, Integer> un : val.getUnits().entrySet()){
+			for(Map.Entry<ChemistryUnit, Integer> un : unitPartValue.getUnitEntrySet()){
 				ChemistryUnit unKey = un.getKey();
-				if(valOut.containsUnitKey(unKey)){
-					valOut.putUnit(unKey, valOut.getUnit(unKey) + val.getUnit(unKey) * unit.getValue());
+				if(unitValue.containsUnitKey(unKey)){
+					unitValue.putUnit(unKey, unitValue.getUnit(unKey) + unitPartValue.getUnit(unKey) * unitPart.getValue());
 				}
 				else{
-					valOut.putUnit(unKey, val.getUnit(unKey) * unit.getValue());
+					unitValue.putUnit(unKey, unitPartValue.getUnit(unKey) * unitPart.getValue());
 				}
 			}
 		}
-		return valOut;
+		return unitValue;
 	}
 
-	private static int gcd(int a, int b){
-		while(b > 0){
-			int tmp = b;
-			b = a % b;
-			a = tmp;
-		}
-		return a;
-	}
+	private static Pair<Integer[], BigFraction[][]> solve(Integer[] rowsPicked, int numOfUnits, int[][] originalMatrix, int numOfEle){
 
-	private static int gcd(int[] ia){
-		int r = ia[0];
-		for(int i = 1; i < ia.length; i++){
-			r = gcd(r, ia[i]);
-		}
-		return r;
-	}
+		//Previously known as system2
+		int[][] workingMatrix = new int[numOfUnits - 1][numOfUnits];
+		//Previously known as system2
+		int[][] workingSquareMatrix = new int[numOfUnits - 1][numOfUnits - 1];
 
-	public static Pair<Integer[], BigFraction[][]> solve(Integer[] randomY, int newArrayRow, int mapNum, int[][] system, int numOfEle){
+		workingMatrix = pick(rowsPicked, originalMatrix, numOfUnits);
 
-		int[][] system2 = new int[newArrayRow][mapNum];
-		int[][] system3 = new int[newArrayRow][mapNum-1];
-
-		Pair<Integer[], int[][]> px = pickRandom(randomY, system, newArrayRow, mapNum);
-		system2 = px.getValueTwo();
-
-		for(int i = 0; i<newArrayRow;i++){
-			for(int j = 0; j<mapNum-1;j++){
-				system3[i][j] = system2[i][j+1];
+		for(int i = 0; i<numOfUnits - 1;i++){
+			for(int j = 0; j<numOfUnits-1;j++){
+				workingSquareMatrix[i][j] = workingMatrix[i][j+1];
 			}
 		}
 
-		int[] target = new int[mapNum-1];
-		Integer[] ia = new Integer[newArrayRow];
-		for(int i = 0; i < ia.length; i++){
-			ia[i] = i;
+		//Previously known as target
+		int[] targetMatrixRows = new int[numOfUnits-1];
+		Integer[] rowList = new Integer[numOfUnits - 1];
+		for(int i = 0; i < rowList.length; i++){
+			rowList[i] = i;
 		}
-		Set<List<Integer>> sli = CombinatoricHelper.permutations(
-				Arrays.asList(ia), ia.length);
-		printArray(system3);
+		Set<List<Integer>> rowOrderPermutations = CombinatoricHelper.permutations(
+				Arrays.asList(rowList), rowList.length);
 
-		megaFor: for(List<Integer> li : sli){
-			boolean fail = false;
-			for(int i = 0; i < target.length; i++){
-				target[i] = -1;
+		rowOrderFor: for(List<Integer> rowOrder : rowOrderPermutations){
+			boolean targetFailed = false;
+			for(int i = 0; i < targetMatrixRows.length; i++){
+				targetMatrixRows[i] = -1;
 			}
-			superFor: for(int i = 0; i < mapNum - 1; i++){
-				outerFor: for(int lx : li){
-					if(system3[lx][i] != 0){
-						for(int k = 0; k<mapNum-1;k++){
-							if(target[k] == lx){
-								continue outerFor;
+			columnFor: for(int column = 0; column < numOfUnits - 1; column++){
+				rowFor: for(int row : rowOrder){
+					if(workingSquareMatrix[row][column] != 0){
+						for(int k = 0; k<numOfUnits-1;k++){
+							if(targetMatrixRows[k] == row){
+								continue rowFor;
 							}
 						}
-						target[i] = lx;
-						continue superFor;
+						targetMatrixRows[column] = row;
+						continue columnFor;
 					}
 				}
-			if(target[i] == -1){
-				fail = true;
-				break;
-			}
-			}
-			if(fail){
+			{
+				if(targetMatrixRows[column] == -1){
+					targetFailed = true;
+					break;
+				}
+			}}
+			if(targetFailed){
 				continue;
 			}
 
-			for(int i : target){
-				Debug.print("aa" + i + " ");
-			}
+			Debug.print("Target Matrix Rows: ");
+			ArrayPrinter.printArray(targetMatrixRows);
+
 			Debug.println();
 
-			BigFraction[][] system4 = new BigFraction[newArrayRow][mapNum];
-			for(int i = 0; i<newArrayRow;i++){
-				for(int j = 0; j<mapNum;j++){
-					Debug.print(system2[i][j] + " ");
-					system4[i][j] = new BigFraction(system2[target[i]][j], 1);
+			//Previously known as system4
+			BigFraction[][] operationMatrix = new BigFraction[numOfUnits - 1][numOfUnits];
+			Debug.println("Working Matrix: ");
+			for(int i = 0; i < numOfUnits - 1; i++){
+				for(int j = 0; j < numOfUnits; j++){
+					Debug.print(workingMatrix[i][j] + " ");
+					operationMatrix[i][j] = new BigFraction(workingMatrix[targetMatrixRows[i]][j], 1);
 				}
 				Debug.println();
 			}
+			Debug.println();
 
-			printArray(system4);
+			Debug.println("Operation Matrix: ");
+			ArrayPrinter.printArray(operationMatrix);
 
-			for(int i = 0; i<newArrayRow;i++){
-				for(int j = i+1; j<newArrayRow; j++){
-					BigFraction temp = system4[j][i+1];
-					for(int k = 0; k<mapNum;k++){
-						Debug.printlnDeep("i:" + i + "j:" + j + "---" + system4[i][i+1]);
+			for(int i = 0; i < numOfUnits - 1; i++){
+				for(int j = i + 1; j < numOfUnits - 1; j++){
+					BigFraction temp = operationMatrix[j][i+1];
+					for(int k = 0; k < numOfUnits; k++){
+						Debug.printlnDeep("i:" + i + "j:" + j + "---" + operationMatrix[i][i+1]);
 						try{
-							system4[j][k] = system4[j][k].subtract(temp.multiply(
-									system4[i][k].divide(system4[i][i+1])));
+							operationMatrix[j][k] = operationMatrix[j][k].subtract(temp.multiply(
+									operationMatrix[i][k].divide(operationMatrix[i][i+1])));
 						}
 						catch(ArithmeticException e){
-							continue megaFor;
+							continue rowOrderFor;
 						}
 					}
 				}
 			}
 
-			Debug.println();
+			Debug.printlnDeep();
 
-			printArray(system4);
+			Debug.println("Operation Matrix Pyramid: ");
+			ArrayPrinter.printArray(operationMatrix);
 
-			int counter2 = 0;
-			for(int i = newArrayRow-1; i>=0;i--){
+			for(int i = 0; i < numOfUnits - 1;i++){
+				int numOfUnitsI = numOfUnits - 2 - i;
 				try{
-					system4[i][0] = system4[i][0].divide(system4[i][mapNum-1-counter2]);
+					operationMatrix[numOfUnitsI][0] = operationMatrix[numOfUnitsI][0].divide(operationMatrix[numOfUnitsI][numOfUnitsI + 1]);
 				}
 				catch(ArithmeticException e){
-					continue megaFor;
+					continue rowOrderFor;
 				}
-				system4[i][mapNum-1-counter2] = system4[i][mapNum-1-counter2].divide(system4[i][mapNum-1-counter2]);
-				for(int j = i-1; j>=0; j--){
-					system4[j][0] = system4[j][0].subtract(system4[j][mapNum-1-counter2].multiply(system4[i][0]));
-					system4[j][mapNum-1-counter2] = system4[j][mapNum-1-counter2].subtract(system4[j][mapNum-1-counter2].multiply(system4[i][mapNum-1-counter2]));
+				operationMatrix[numOfUnitsI][numOfUnitsI + 1] = operationMatrix[numOfUnitsI][numOfUnitsI + 1].divide(operationMatrix[numOfUnitsI][numOfUnitsI + 1]);
+				for(int j = numOfUnitsI-1; j>=0; j--){
+					operationMatrix[j][0] = operationMatrix[j][0].subtract(operationMatrix[j][numOfUnitsI + 1].multiply(operationMatrix[numOfUnitsI][0]));
+					operationMatrix[j][numOfUnitsI + 1] = operationMatrix[j][numOfUnitsI + 1].subtract(operationMatrix[j][numOfUnitsI + 1].multiply(operationMatrix[numOfUnitsI][numOfUnitsI + 1]));
 				}
-				counter2++;
 
 			}
 
-			printArray(system4);
+			Debug.println("Operation Matrix Identity: ");
+			ArrayPrinter.printArray(operationMatrix);
 
-			check(newArrayRow, mapNum, target, system3);
-
-			Integer[] iax = px.getValueOne();
-
-			Integer[] outIax = new Integer[iax.length];
-			int i = 0;
-			for(Integer inx : iax){
-				outIax[target[i]] = inx;
-				Debug.println(inx);
-				i++;
+			Integer[] outRowsPicked = new Integer[rowsPicked.length];
+			int rowsPickedI = 0;
+			Debug.print("Rows picked: ");
+			for(Integer rowPicked : rowsPicked){
+				outRowsPicked[targetMatrixRows[rowsPickedI]] = rowPicked;
+				Debug.print(rowPicked + " ");
+				rowsPickedI++;
 			}
+			Debug.println();
 
-			printArray(outIax);
+			Debug.print("Row outcome: ");
+			ArrayPrinter.printArray(outRowsPicked);
 
-			return new Pair<Integer[], BigFraction[][]>(outIax, system4);
+			Debug.println();
+
+			return Pair.make(outRowsPicked, operationMatrix);
 		}
 		return null;
 	}
 
-	private static Pair<Integer[], int[][]> pickRandom(Integer[] randomY, int[][] system, int newArrayRow, int mapNum){
-		if(randomY == null){
-			Integer[] randomX = new Integer[newArrayRow - 1];
-			for(int i = 0; i < randomX.length; i++){
-				randomX[i] = i + 2;
-			}
-			List<Integer> ia = Arrays.<Integer>asList(randomX);
-			Collections.shuffle(ia);
-			randomX = ia.toArray(randomX);
-			randomY = new Integer[newArrayRow];
-			System.arraycopy(randomX, 0, randomY, 1, randomX.length);
-			randomY[0] = 1;
+	private static int[][] pick(Integer[] pickOrder, int[][] originalMatrix, int numOfUnits){
+		Debug.println("Testing Permutation: " + Arrays.asList(pickOrder));
+		int[][] workingMatrix = new int[numOfUnits - 1][numOfUnits];
+		for(int i = 0; i<numOfUnits - 1;i++){
+			workingMatrix[i] = originalMatrix[pickOrder[i]];
 		}
-		Debug.println(Arrays.asList(randomY));
-		int[][] system2 = new int[newArrayRow][mapNum];
-		for(int i = 0; i<newArrayRow;i++){
-			system2[i] = system[randomY[i]];
-		}
-		Integer[] outX = new Integer[newArrayRow];
-		System.arraycopy(randomY, 0, outX, 0, newArrayRow);
-		return new Pair<Integer[], int[][]>(outX, system2);
+		return workingMatrix;
 	}
 
-	public static int add(boolean b, ChemistryUnit inX, ArrayList<ChemistryUnit> elements, int[][] system, int initCounter){
-		int counter = initCounter;
-		for(Map.Entry<ChemistryUnit, Integer> map : inX.getUnits().entrySet()){
-			for(Map.Entry<ChemistryUnit, Integer> entry : map.getKey().getUnits().entrySet()){
-				int temp = 0;
-				for(int i = 0; i<elements.size();i++){
-					if(elements.get(i).equals(entry.getKey())){
-						temp = i;
+	private static int add(boolean b, ChemistryUnit inX, ArrayList<ChemistryUnit> uniqueUnitTypes, int[][] originalMatrix, int counterInitialValue){
+		int originalMatrixCounter = counterInitialValue;
+		for(Map.Entry<ChemistryUnit, Integer> map : inX.getUnitEntrySet()){
+			for(Map.Entry<ChemistryUnit, Integer> entry : map.getKey().getUnitEntrySet()){
+				int index = 0;
+				for(int i = 0; i<uniqueUnitTypes.size();i++){
+					if(uniqueUnitTypes.get(i).equals(entry.getKey())){
+						index = i;
 					}
 				}
-				system[temp][counter] = counter != 0 && b ? -entry.getValue() : entry.getValue();
+				originalMatrix[index][originalMatrixCounter] = originalMatrixCounter != 0 && b ? -entry.getValue() : entry.getValue();
 			}
 
-			counter++;
+			originalMatrixCounter++;
 		}
-		return counter;
+		return originalMatrixCounter;
 	}
 
-	public static boolean check(int newArrayRow, int mapNum, int[] target, int[][] system3){
-		boolean done = false;
-		boolean onTarget = false;
-		int zeroes = 0;
-		int rowDone = 0;
-		outerFor: for(int i = 0; i<newArrayRow;i++){
-			onTarget = false;
-			zeroes = 0;
-			for(int j = 0; j<mapNum-1;j++){
-				if(j != target[i]){
-					if(system3[i][j] !=0){
-						break outerFor;
-					}else{
-						zeroes++;
-					}
-				}else{
-					if(target[i] !=1){
-						break outerFor;
-					}else{
-						onTarget = true;
-					}
-				}
-			}
-			if(zeroes == mapNum-2 && onTarget){
-				rowDone++;
-			}
-		}
-		if(rowDone == newArrayRow){
-			done = true;
-		}else{
-			done = false;
-		}
-		return done;
-	}
-
-	private static void printArray(int[][] arr){
-		for(int[] ia : arr){
-			for(int i : ia){
-				Debug.print(i + " ");
-			}
-			Debug.println();
+	public static boolean balanced(ChemistryUnit inExpression, ChemistryUnit outExpression){
+		ChemistryUnit apartInExpression = apart(inExpression);
+		ChemistryUnit apartOutExpression = apart(outExpression);
+		for(Map.Entry<ChemistryUnit, Integer> outEntry : apartOutExpression.getUnitEntrySet()){
+			Debug.print(outEntry + ";");
 		}
 		Debug.println();
-	}
-
-	private static <T> void printArray(T[][] arr){
-		for(T[] ia : arr){
-			for(T i : ia){
-				Debug.print(i + " ");
-			}
-			Debug.println();
-		}
-		Debug.println();
-	}
-
-	private static <T> void printArray(T[] outIax){
-		for(T i : outIax){
-			Debug.print(i + " ");
-		}
-		Debug.println();
-	}
-
-	public static class EquationComparator implements Comparator<int[]>{
-
-		@Override
-		public int compare(int[] o1, int[] o2){
-			return Integer.compare(o1[1], o2[1]);
-		}
-
-	}
-
-	public static boolean balanced(ChemistryUnit inX, ChemistryUnit outX){
-		ChemistryUnit inZ = apart(inX);
-		ChemistryUnit outZ = apart(outX);
-		for(Map.Entry<ChemistryUnit, Integer> outZero : outZ.getUnits().entrySet()){
-			Debug.print(outZero + ";");
-		}
-		Debug.println();
-		for(Map.Entry<ChemistryUnit, Integer> inZero : inZ.getUnits().entrySet()){
-			Debug.print(inZero + ";");
-			ChemistryUnit inKey = inZero.getKey();
+		for(Map.Entry<ChemistryUnit, Integer> inEntry : apartInExpression.getUnitEntrySet()){
+			Debug.print(inEntry + ";");
+			ChemistryUnit inKey = inEntry.getKey();
 			if(inKey.getType() == ChemistryUnit.TYPE_NEST){
+				Debug.println();
 				throw new IllegalArgumentException("Illegal in - separation!");
 			}
-			if(!outZ.containsUnitKey(inKey) || !outZ.getUnit(inKey).equals(inZero.getValue())){
-				Debug.println(inKey + ":" + outZ.getUnit(inKey) + ":" + inZero.getValue() + ";");
-				Debug.println("Not Balanced! 01");
+			if(!apartOutExpression.containsUnitKey(inKey) || !apartOutExpression.getUnit(inKey).equals(inEntry.getValue())){
+				Debug.println();
+				Debug.println(inKey + ":" + apartOutExpression.getUnit(inKey) + ":" + inEntry.getValue() + ";");
+				Debug.println("Not Balanced!");
+				Debug.println();
 				return false;
 			}
 		}
-		for(Map.Entry<ChemistryUnit, Integer> outZero : outZ.getUnits().entrySet()){
-			ChemistryUnit inKey = outZero.getKey();
-			if(!outZ.containsUnitKey(inKey)){
-				Debug.println("Not Balanced! 02");
+		for(Map.Entry<ChemistryUnit, Integer> outEntry : apartOutExpression.getUnitEntrySet()){
+			ChemistryUnit inKey = outEntry.getKey();
+			if(!apartOutExpression.containsUnitKey(inKey)){
+				Debug.println();
+				Debug.println("Not Balanced!");
+				Debug.println();
 				return false;
 			}
 		}
+		Debug.println();
 		Debug.println("Balanced!");
+		Debug.println();
 		return true;
 	}
 }

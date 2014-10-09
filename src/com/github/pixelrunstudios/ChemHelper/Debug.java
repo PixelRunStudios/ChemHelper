@@ -2,7 +2,7 @@ package com.github.pixelrunstudios.ChemHelper;
 
 public class Debug{
 
-	public static final boolean DEEP_DEBUG = true;
+	public static final boolean DEEP_DEBUG = false;
 	public static final boolean DEBUG = true;
 
 	public static void print(Object o){
