@@ -2,7 +2,7 @@ package com.github.pixelrunstudios.ChemHelper;
 
 import java.util.Map;
 
-public class ParseCompound{
+public class ChemistryParser{
 	public static ChemistryUnit parseCompound(String compound){
 		if(findNest(compound, Integer.MIN_VALUE, false).getValueOne() != 0){
 			throw new IllegalArgumentException("For input string: " + compound);
@@ -143,17 +143,11 @@ public class ParseCompound{
 	private static void inParenToElements(ChemistryUnit elements,
 			ChemistryUnit elementsInParen, String tempNumber){
 		Integer i = Integer.parseInt(tempNumber);
-		/*for(Map.Entry<ChemistryUnit, Integer> ix : elementsInParen.getSubUnits().entrySet()){
-			elementsInParen.putUnit(ix.getKey(), ix.getValue() * i);
-		}
-		elements.putAllUnits(elementsInParen.getSubUnits());*/
 		if(elementsInParen.unitSize() == 0 && elementsInParen.getName() == null){
-			System.out.println("po");
-
+			Debug.printlnDeep("po");
 			return;
 		}
 		elements.putUnit(elementsInParen, i);
-		//elementsInParen.clearUnit();
 	}
 
 	public static ChemistryUnit

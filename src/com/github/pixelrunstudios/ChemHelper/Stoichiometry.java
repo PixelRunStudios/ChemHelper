@@ -8,7 +8,7 @@ public class Stoichiometry{
 			String inUnit, String inSub, String outUnit, String outSub,
 			Map<String, String> data){
 		// TODO Auto-generated method stub
-		Pair<ChemistryUnit, ChemistryUnit> iao = ParseCompound.
+		Pair<ChemistryUnit, ChemistryUnit> iao = ChemistryParser.
 				parseEquation(inEq, outEq);
 		if(iao == null){
 			//System.out.println("N/A");
@@ -16,8 +16,8 @@ public class Stoichiometry{
 		}
 		ChemistryUnit in = iao.getValueOne();
 		ChemistryUnit out = iao.getValueTwo();
-		ChemistryUnit inZ = ParseCompound.parseCompound(inSub);
-		ChemistryUnit outZ = ParseCompound.parseCompound(outSub);
+		ChemistryUnit inZ = ChemistryParser.parseCompound(inSub);
+		ChemistryUnit outZ = ChemistryParser.parseCompound(outSub);
 		int inNum = 0;
 		int outNum = 0;
 		Pair<Boolean, Integer> inp = huntDown(in, inZ, outZ);

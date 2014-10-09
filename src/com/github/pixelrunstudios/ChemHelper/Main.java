@@ -8,7 +8,7 @@ public class Main{
 	public static final String COMPOUND = "(H(OH))2";
 	public static void main(String[] args){
 		// TODO Auto-generated method stub
-		ChemistryUnit elements = ParseCompound.parseCompound(COMPOUND);
+		ChemistryUnit elements = ChemistryParser.parseCompound(COMPOUND);
 
 		printU(elements);
 

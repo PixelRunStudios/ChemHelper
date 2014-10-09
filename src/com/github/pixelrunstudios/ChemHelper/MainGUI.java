@@ -103,7 +103,7 @@ public class MainGUI extends JFrame{
 			public void actionPerformed(ActionEvent e) {
 				try{
 					label.setText(String.valueOf(MolarMass.calculate(
-							ParseCompound.parseExpression(textField.getText())
+							ChemistryParser.parseExpression(textField.getText())
 							, FileToMap.readMapFromFile(new File("elements.txt")))));
 				}
 				catch(Exception e1){
@@ -155,13 +155,13 @@ public class MainGUI extends JFrame{
 			public void actionPerformed(ActionEvent e) {
 				try{
 					Pair<ChemistryUnit, ChemistryUnit> pair =
-							ParseCompound.parseEquation(inB.getText(), outB.getText());
+							ChemistryParser.parseEquation(inB.getText(), outB.getText());
 					if(pair == null){
 						coeff.setText("Equation cannot be balanced!");
 					}
 					else{
-						String out = ParseCompound.expressionToString(pair.getValueOne()) + " -> " +
-								ParseCompound.expressionToString(pair.getValueTwo());
+						String out = ChemistryParser.expressionToString(pair.getValueOne()) + " -> " +
+								ChemistryParser.expressionToString(pair.getValueTwo());
 						coeff.setText(out);
 					}
 				}
