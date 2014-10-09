@@ -146,7 +146,7 @@ public class EquationBalancer{
 					}
 				}
 				if(!yesEle){
-					println("hi");
+					//println("hi");
 					elements.add(entry.getKey());
 				}
 			}
@@ -165,7 +165,7 @@ public class EquationBalancer{
 			}
 		}
 		for(int i = 0; i<elements.size();i++){
-			println(elements.get(i));
+			print(elements.get(i) + " ");
 		}
 		println();
 		mapNum = inX.getSubUnits().size() + outX.getSubUnits().size();
@@ -566,6 +566,7 @@ public class EquationBalancer{
 				}
 				println();
 			}
+			println();
 			for(int i = 0;i<newArrayRow;i++){
 				for(int j = 0; j<mapNum;j++){
 					print(system4[i][j] + " ");
@@ -614,7 +615,6 @@ public class EquationBalancer{
 
 			}
 
-			println();
 			for(int i = 0;i<newArrayRow;i++){
 				for(int j = 0; j<mapNum;j++){
 					print(system4[i][j] + " ");
@@ -779,16 +779,17 @@ public class EquationBalancer{
 		ChemistryUnit inZ = apart(inX);
 		ChemistryUnit outZ = apart(outX);
 		for(Map.Entry<ChemistryUnit, Integer> outZero : outZ.getUnits().entrySet()){
-			System.out.println(outZero);
+			print(outZero + ";");
 		}
+		println();
 		for(Map.Entry<ChemistryUnit, Integer> inZero : inZ.getUnits().entrySet()){
-			System.out.println(inZero);
+			print(inZero + ";");
 			ChemistryUnit inKey = inZero.getKey();
 			if(inKey.getType() == ChemistryUnit.TYPE_NEST){
 				throw new IllegalArgumentException("Illegal in - separation!");
 			}
 			if(!outZ.containsUnitKey(inKey) || !outZ.getUnit(inKey).equals(inZero.getValue())){
-				println(inKey + ":" + outZ.getUnit(inKey) + ":" + inZero.getValue());
+				println(inKey + ":" + outZ.getUnit(inKey) + ":" + inZero.getValue() + ";");
 				println("Not Balanced! 01");
 				return false;
 			}
