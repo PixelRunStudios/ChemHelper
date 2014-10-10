@@ -28,7 +28,7 @@ public class Main{
 		}*/
 	}
 
-	public static void printU(ChemistryUnit unit){
+	private static void printU(ChemistryUnit unit){
 		if(unit.getType() == ChemistryUnit.TYPE_BASE){
 			System.out.print(unit.getName());
 		}

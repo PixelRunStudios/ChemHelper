@@ -31,7 +31,7 @@ public class ChemistryUnit implements Comparable<ChemistryUnit>{
 
 	protected void putUnit(ChemistryUnit key, Integer value){
 		if(value == 0){
-			System.out.println("a");
+			Debug.printDeep("a");
 			return;
 		}
 		units.put(key, value);

@@ -7,11 +7,10 @@ public class Stoichiometry{
 	public static double convert(String inEq, String outEq, double amt,
 			String inUnit, String inSub, String outUnit, String outSub,
 			Map<String, String> data){
-		// TODO Auto-generated method stub
 		Pair<ChemistryUnit, ChemistryUnit> iao = ChemistryParser.
 				parseEquation(inEq, outEq);
 		if(iao == null){
-			//System.out.println("N/A");
+			Debug.printlnDeep("N/A");
 			throw new IllegalArgumentException("Cannot be converted!");
 		}
 		ChemistryUnit in = iao.getValueOne();
@@ -22,7 +21,7 @@ public class Stoichiometry{
 		int outNum = 0;
 		Pair<Boolean, Integer> inp = huntDown(in, inZ, outZ);
 		if(inp.getValueTwo() < 0){
-			//System.out.println("N/A");
+			Debug.printlnDeep("N/A");
 			throw new IllegalArgumentException("Cannot be converted!");
 		}
 		else{
@@ -35,7 +34,7 @@ public class Stoichiometry{
 		}
 		Pair<Boolean, Integer> oup = huntDown(out, inZ, outZ);
 		if(oup.getValueTwo() < 0){
-			System.out.println("N/A");
+			Debug.printlnDeep("N/A");
 			return 0;
 		}
 		else{
@@ -68,20 +67,20 @@ public class Stoichiometry{
 		return amt * inToMole * outOverIn * outToMole;
 	}
 
-	//True if inz
-	private static Pair<Boolean, Integer> huntDown(ChemistryUnit in, ChemistryUnit inZ,
-			ChemistryUnit outZ){
-		if(in.equals(inZ)){
+	//True if inExpression is found
+	private static Pair<Boolean, Integer> huntDown(ChemistryUnit in, ChemistryUnit inExpression,
+			ChemistryUnit outExpression){
+		if(in.equals(inExpression)){
 			return Pair.make(true, 1);
 		}
-		else if(in.equals(outZ)){
+		else if(in.equals(outExpression)){
 			return Pair.make(false, 1);
 		}
 		else if(in.getType() == ChemistryUnit.TYPE_BASE){
 			return Pair.make(false, -1);
 		}
 		for(Map.Entry<ChemistryUnit, Integer> cu : in.getSubUnits().entrySet()){
-			Pair<Boolean, Integer> pair = huntDown(cu.getKey(), inZ, outZ);
+			Pair<Boolean, Integer> pair = huntDown(cu.getKey(), inExpression, outExpression);
 			if(pair.getValueTwo().equals(-1)){
 				continue;
 			}
