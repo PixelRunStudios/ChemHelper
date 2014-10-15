@@ -79,10 +79,10 @@ na_classification=alkali-metal
 
 mg_name=magnesium
 mg_atomic-number=12
-mg_atomic-mass=alkaline-earth-metal
+mg_atomic-mass=24.305
 mg_group=2
 mg_period=3
-mg_classification=24.305
+mg_classification=alkaline-earth-metal
 
 al_name=aluminum
 al_atomic-number=13
