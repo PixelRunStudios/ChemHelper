@@ -1,7 +1,9 @@
 package com.github.pixelrunstudios.ChemHelper;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class IdealGas {
@@ -51,7 +53,7 @@ public class IdealGas {
 		conversion.put("gal", gal);
 		conversion.put("ft3", ft3);
 	}
-	public static ArrayList<Double> calc(String p1S, String p1US, String v1S, String v1US, String n1S, String t1S, String t1US,
+	public static List<Double> calc(String p1S, String p1US, String v1S, String v1US, String n1S, String t1S, String t1US,
 			String p2S, String p2US, String v2S, String v2US, String n2S, String t2S, String t2US){
 		ArrayList<Pair<Boolean, Pair<Double, String>>> input = new ArrayList<Pair<Boolean, Pair<Double, String>>>(8);
 		input.add(isFilled(p1S, p1US));
@@ -66,34 +68,42 @@ public class IdealGas {
 		int firstFilled = 0;
 		int secondFilled = 0;
 		int pCount = 0;
-		ArrayList<Pair<Integer, Pair<Double, String>>> first = new ArrayList<Pair<Integer, Pair<Double, String>>>();
-		ArrayList<Pair<Integer, Pair<Double, String>>> second = new ArrayList<Pair<Integer, Pair<Double, String>>>();
+		Map<Integer, Pair<Double, String>> first = new HashMap<Integer, Pair<Double, String>>();
+		Map<Integer, Pair<Double, String>> firstAfter = new HashMap<Integer, Pair<Double, String>>();
+		Map<Integer, Pair<Double, String>> second = new HashMap<Integer, Pair<Double, String>>();
+		Map<Integer, Pair<Double, String>> last = new HashMap<Integer, Pair<Double, String>>();
+		Map<Integer, Pair<Double, String>> firstAfterAfter = new HashMap<Integer, Pair<Double, String>>();
+
 
 		for(Pair<Boolean, Pair<Double, String>> p : input){
 			if(pCount < 4 && p.getValueOne()){
 				firstFilled++;
-				first.add(Pair.make(pCount, p.getValueTwo()));
+				first.put(pCount, p.getValueTwo());
 			}
 			else if(pCount >= 4 && p.getValueOne()){
 				secondFilled++;
-				second.add(Pair.make(pCount, p.getValueTwo()));
+				second.put(pCount, p.getValueTwo());
 			}
 			pCount++;
 		}
-		pCount = 0;
-		for(Pair<Integer, Pair<Double, String>> p : first){
-			if(p.getValueOne() == 0){
-				first.add(pCount, Pair.make(p.getValueOne(), Pair.make(convert(p.getValueTwo().getValueOne(), p.getValueTwo().getValueTwo(), "kPa"), "kPa")));
+		for(Map.Entry<Integer, Pair<Double, String>> p : first.entrySet()){
+			if(p.getKey() == 0){
+				firstAfter.put(p.getKey(), Pair.make(convert(p.getValue().getValueOne(), p.getValue().getValueTwo(), "kPa"), "kPa"));
 			}
-			if(p.getValueOne() == 1){
-				first.add(pCount, Pair.make(p.getValueOne(), Pair.make(convert(p.getValueTwo().getValueOne(), p.getValueTwo().getValueTwo(), "L"), "L")));
+			if(p.getKey() == 1){
+				firstAfter.put(p.getKey(), Pair.make(convert(p.getValue().getValueOne(), p.getValue().getValueTwo(), "L"), "L"));
 			}
-			if(p.getValueOne() == 3){
-				first.add(pCount, Pair.make(p.getValueOne(), Pair.make(convert(p.getValueTwo().getValueOne(), p.getValueTwo().getValueTwo(), "K"), "K")));
+			if(p.getKey() == 2){
+				firstAfter.put(p.getKey(), p.getValue());
 			}
-			pCount++;
+			if(p.getKey() == 3){
+				firstAfter.put(p.getKey(), Pair.make(convert(p.getValue().getValueOne(), p.getValue().getValueTwo(), "K"), "K"));
+			}
 		}
 
+		System.out.println(firstAfter);
+
+		/*
 		pCount = 0;
 		for(Pair<Integer, Pair<Double, String>> p : second){
 			if(p.getValueOne() == 0){
@@ -107,26 +117,31 @@ public class IdealGas {
 			}
 			pCount++;
 		}
-
+		 */
 
 		double lastVal = 0;
 
 		if(firstFilled == 3){
 			int missing = -1;
 			boolean first0 = false;
-			for(int i = 0; i < first.size(); i++){
-				if(first0){
+			for(int i = 0; i <= 3; i++){
+				if(!firstAfter.containsKey(i)){
+					missing = i;
+				}
+				/*if(first0){
 					if(first.get(i).getValueOne() != first.get(i-1).getValueOne() + 1){
-						missing = first.get(i).getValueOne() - 1;
+						missing = firstAfter.get(i).getValueOne() - 1;
 					}
 				}
 				if(i == 0 && first.get(0).getValueOne() == 0){
 					first0 = true;
 				}else{
 					missing = 0;
-				}
+				}*/
 			}
-			lastVal = all4(first, missing);
+
+			System.out.println(missing);
+			lastVal = all4(firstAfter, missing);
 			if(missing == 0){
 				lastVal = convert(lastVal, "kPa", input.get(0).getValueTwo().getValueTwo());
 			}
@@ -136,7 +151,8 @@ public class IdealGas {
 			if(missing == 3){
 				lastVal = convert(lastVal, "K", input.get(3).getValueTwo().getValueTwo());
 			}
-			first.set(missing, Pair.make(missing, Pair.make(lastVal, "std")));
+			firstAfterAfter.putAll(first);
+			firstAfterAfter.put(missing, Pair.make(lastVal, "std"));
 
 		}
 
@@ -145,16 +161,16 @@ public class IdealGas {
 			//to be added
 		}
 
-		ArrayList<Double> total = new ArrayList<Double>();
-		for(Pair<Integer, Pair<Double, String>> p : first){
-			total.add(p.getValueTwo().getValueOne());
+		Double[] total = new Double[8];
+		for(Map.Entry<Integer, Pair<Double, String>> p : firstAfterAfter.entrySet()){
+			total[p.getKey()] = p.getValue().getValueOne();
 		}
 
-		for(Pair<Integer, Pair<Double, String>> p : second){
-			total.add(p.getValueTwo().getValueOne());
+		for(Map.Entry<Integer, Pair<Double, String>> p : firstAfterAfter.entrySet()){
+			total[p.getKey()] = p.getValue().getValueOne();
 		}
 
-		return total;
+		return Arrays.asList(total);
 
 	}
 
@@ -168,25 +184,27 @@ public class IdealGas {
 
 	}
 
-	public static double all4(ArrayList<Pair<Integer, Pair<Double,String>>> first, int missing){
+	public static double all4(Map<Integer, Pair<Double,String>> first, int missing){
 		double val = 0;
 		if(missing == 0){
-			val = first.get(1).getValueTwo().getValueOne()*R*first.get(2).getValueTwo().getValueOne()*1.0/first.get(0).getValueTwo().getValueOne();
+			val = 1.0/first.get(1).getValueOne()*R*first.get(2).getValueOne()*first.get(3).getValueOne();
 		}
 		else if(missing == 1){
-			val = first.get(1).getValueTwo().getValueOne()*R*first.get(2).getValueTwo().getValueOne()*1.0/first.get(0).getValueTwo().getValueOne();
+			val = 1.0/first.get(0).getValueOne()*R*first.get(2).getValueOne()*first.get(3).getValueOne();
 		}
 		else if(missing == 2){
-			val = first.get(0).getValueTwo().getValueOne()*first.get(1).getValueTwo().getValueOne()*1.0/R*first.get(2).getValueTwo().getValueOne();
+			val = 1.0*first.get(0).getValueOne()*first.get(1).getValueOne()/R/first.get(3).getValueOne();
 		}
 		else if(missing == 3){
-			val = first.get(0).getValueTwo().getValueOne()*first.get(1).getValueTwo().getValueOne()*1.0/first.get(2).getValueTwo().getValueOne()*R;
+			val = 1.0*first.get(0).getValueOne()*first.get(1).getValueOne()/first.get(2).getValueOne()/R;
 		}
 		return val;
 	}
 
 	public static double convert(double n, String first, String second){
-		if(!first.equals("K") || !second.equals("K")){
+		if(!first.equals("K") && !second.equals("K")){
+			System.out.println(second);
+			System.out.println(first);
 			return n*(conversion.get(second)/conversion.get(first));
 		}
 		else if(first.equals("C") && second.equals("K")){

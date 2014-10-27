@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -73,7 +74,7 @@ public class MainGUI extends JFrame{
 	public MainGUI(){
 		setTitle("ChemHelper");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 600, 640);
+		setBounds(100, 100, 800, 640);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -277,7 +278,7 @@ public class MainGUI extends JFrame{
 
 		pText = new JTextField();
 		panel_15.add(pText);
-		pText.setColumns(3);
+		pText.setColumns(8);
 
 		pDrop = new JComboBox<String>();
 		pDrop.addItem("kPa");
@@ -295,7 +296,7 @@ public class MainGUI extends JFrame{
 		panel_15.add(lblV);
 
 		vText = new JTextField();
-		vText.setColumns(3);
+		vText.setColumns(8);
 		panel_15.add(vText);
 
 		vDrop = new JComboBox<String>();
@@ -313,14 +314,14 @@ public class MainGUI extends JFrame{
 		panel_15.add(lblN);
 
 		nText = new JTextField();
-		nText.setColumns(3);
+		nText.setColumns(8);
 		panel_15.add(nText);
 
 		JLabel lblT = new JLabel("T:");
 		panel_15.add(lblT);
 
 		tText = new JTextField();
-		tText.setColumns(3);
+		tText.setColumns(8);
 		panel_15.add(tText);
 
 		tDrop = new JComboBox<String>();
@@ -341,7 +342,7 @@ public class MainGUI extends JFrame{
 		btnGo_3.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				ArrayList<Double> total = new ArrayList<Double>();
+				List<Double> total = new ArrayList<Double>();
 				total = IdealGas.calc(pText.getText(), (String) pDrop.getSelectedItem(),
 						vText.getText(), (String) vDrop.getSelectedItem(),
 						nText.getText(),
@@ -354,10 +355,10 @@ public class MainGUI extends JFrame{
 				vText.setText(total.get(1).toString());
 				nText.setText(total.get(2).toString());
 				tText.setText(total.get(3).toString());
-				p2Text.setText(total.get(4).toString());
-				v2Text.setText(total.get(5).toString());
-				n2Text.setText(total.get(6).toString());
-				t2Text.setText(total.get(7).toString());
+				//p2Text.setText(total.get(4).toString());
+				//v2Text.setText(total.get(5).toString());
+				//n2Text.setText(total.get(6).toString());
+				//t2Text.setText(total.get(7).toString());
 
 			}
 		});
@@ -367,7 +368,7 @@ public class MainGUI extends JFrame{
 		panel_17.add(label_4);
 
 		p2Text = new JTextField();
-		p2Text.setColumns(3);
+		p2Text.setColumns(8);
 		panel_17.add(p2Text);
 
 		p2Drop = new JComboBox<String>();
@@ -385,7 +386,7 @@ public class MainGUI extends JFrame{
 		panel_17.add(label_5);
 
 		v2Text = new JTextField();
-		v2Text.setColumns(3);
+		v2Text.setColumns(8);
 		panel_17.add(v2Text);
 
 		v2Drop = new JComboBox<String>();
@@ -403,7 +404,7 @@ public class MainGUI extends JFrame{
 		panel_17.add(label_6);
 
 		n2Text = new JTextField();
-		n2Text.setColumns(3);
+		n2Text.setColumns(8);
 		panel_17.add(n2Text);
 
 		JLabel label_7 = new JLabel("T:");
@@ -411,7 +412,7 @@ public class MainGUI extends JFrame{
 		panel_17.add(label_7);
 
 		t2Text = new JTextField();
-		t2Text.setColumns(3);
+		t2Text.setColumns(8);
 		panel_17.add(t2Text);
 
 		t2Drop = new JComboBox<String>();
