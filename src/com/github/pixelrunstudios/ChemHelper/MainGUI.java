@@ -5,6 +5,7 @@ import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.ArrayList;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -16,7 +17,6 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
-import java.awt.FlowLayout;
 
 public class MainGUI extends JFrame{
 
@@ -38,10 +38,16 @@ public class MainGUI extends JFrame{
 	private JTextField vText;
 	private JTextField nText;
 	private JTextField tText;
-	private JTextField textField_1;
-	private JTextField textField_2;
-	private JTextField textField_3;
-	private JTextField textField_4;
+	private JTextField p2Text;
+	private JTextField v2Text;
+	private JTextField n2Text;
+	private JTextField t2Text;
+	private JComboBox<String> p2Drop;
+	private JComboBox<String> v2Drop;
+	private JComboBox<String> t2Drop;
+	private JComboBox<String> pDrop;
+	private JComboBox<String> vDrop;
+	private JComboBox<String> tDrop;
 
 	/**
 	 * Launch the application.
@@ -258,40 +264,41 @@ public class MainGUI extends JFrame{
 
 		JButton btnGo_1 = new JButton("Go");
 		panel_9.add(btnGo_1);
-		
+
 		JPanel panel_14 = new JPanel();
 		contentPane.add(panel_14);
 		panel_14.setLayout(new BoxLayout(panel_14, BoxLayout.Y_AXIS));
-		
+
 		JPanel panel_15 = new JPanel();
 		panel_14.add(panel_15);
-		
+
 		JLabel lblP = new JLabel("P:");
 		panel_15.add(lblP);
-		
+
 		pText = new JTextField();
 		panel_15.add(pText);
 		pText.setColumns(3);
-		
-		JComboBox<String> pDrop = new JComboBox<String>();
+
+		pDrop = new JComboBox<String>();
 		pDrop.addItem("kPa");
 		pDrop.addItem("Pa");
 		pDrop.addItem("atm");
 		pDrop.addItem("mmHg");
+		pDrop.addItem("inHg");
 		pDrop.addItem("bar");
 		pDrop.addItem("torr");
 		pDrop.addItem("psi");
 
 		panel_15.add(pDrop);
-		
+
 		JLabel lblV = new JLabel("V:");
 		panel_15.add(lblV);
-		
+
 		vText = new JTextField();
 		vText.setColumns(3);
 		panel_15.add(vText);
-		
-		JComboBox<String> vDrop = new JComboBox<String>();
+
+		vDrop = new JComboBox<String>();
 		vDrop.addItem("L");
 		vDrop.addItem("mL");
 		vDrop.addItem("m3");
@@ -301,71 +308,117 @@ public class MainGUI extends JFrame{
 		vDrop.addItem("ft3");
 
 		panel_15.add(vDrop);
-		
+
 		JLabel lblN = new JLabel("n:");
 		panel_15.add(lblN);
-		
+
 		nText = new JTextField();
 		nText.setColumns(3);
 		panel_15.add(nText);
-		
+
 		JLabel lblT = new JLabel("T:");
 		panel_15.add(lblT);
-		
+
 		tText = new JTextField();
 		tText.setColumns(3);
 		panel_15.add(tText);
-		
-		JComboBox<String> tDrop = new JComboBox<String>();
+
+		tDrop = new JComboBox<String>();
 		tDrop.addItem("K");
 		tDrop.addItem("C");
 		tDrop.addItem("F");
 
 
 		panel_15.add(tDrop);
-		
+
 		JPanel panel_17 = new JPanel();
 		panel_14.add(panel_17);
-		
+
 		JPanel panel_16 = new JPanel();
 		panel_14.add(panel_16);
-		
+
+		JButton btnGo_3 = new JButton("Go");
+		btnGo_3.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				ArrayList<Double> total = new ArrayList<Double>();
+				total = IdealGas.calc(pText.getText(), (String) pDrop.getSelectedItem(),
+						vText.getText(), (String) vDrop.getSelectedItem(),
+						nText.getText(),
+						tText.getText(), (String) tDrop.getSelectedItem(),
+						p2Text.getText(), (String) p2Drop.getSelectedItem(),
+						v2Text.getText(), (String) v2Drop.getSelectedItem(),
+						n2Text.getText(),
+						t2Text.getText(), (String) t2Drop.getSelectedItem());
+				pText.setText(total.get(0).toString());
+				vText.setText(total.get(1).toString());
+				nText.setText(total.get(2).toString());
+				tText.setText(total.get(3).toString());
+				p2Text.setText(total.get(4).toString());
+				v2Text.setText(total.get(5).toString());
+				n2Text.setText(total.get(6).toString());
+				t2Text.setText(total.get(7).toString());
+
+			}
+		});
+		panel_16.add(btnGo_3);
+
 		JLabel label_4 = new JLabel("P:");
 		panel_17.add(label_4);
-		
-		textField_1 = new JTextField();
-		textField_1.setColumns(3);
-		panel_17.add(textField_1);
-		
-		JComboBox<String> comboBox = new JComboBox<String>();
-		panel_17.add(comboBox);
-		
+
+		p2Text = new JTextField();
+		p2Text.setColumns(3);
+		panel_17.add(p2Text);
+
+		p2Drop = new JComboBox<String>();
+		p2Drop.addItem("kPa");
+		p2Drop.addItem("Pa");
+		p2Drop.addItem("atm");
+		p2Drop.addItem("mmHg");
+		p2Drop.addItem("inHg");
+		p2Drop.addItem("bar");
+		p2Drop.addItem("torr");
+		p2Drop.addItem("psi");
+		panel_17.add(p2Drop);
+
 		JLabel label_5 = new JLabel("V:");
 		panel_17.add(label_5);
-		
-		textField_2 = new JTextField();
-		textField_2.setColumns(3);
-		panel_17.add(textField_2);
-		
-		JComboBox<String> comboBox_1 = new JComboBox<String>();
-		panel_17.add(comboBox_1);
-		
+
+		v2Text = new JTextField();
+		v2Text.setColumns(3);
+		panel_17.add(v2Text);
+
+		v2Drop = new JComboBox<String>();
+		v2Drop.addItem("L");
+		v2Drop.addItem("mL");
+		v2Drop.addItem("m3");
+		v2Drop.addItem("fl oz");
+		v2Drop.addItem("qt");
+		v2Drop.addItem("gal");
+		v2Drop.addItem("ft3");
+
+		panel_17.add(v2Drop);
+
 		JLabel label_6 = new JLabel("n:");
 		panel_17.add(label_6);
-		
-		textField_3 = new JTextField();
-		textField_3.setColumns(3);
-		panel_17.add(textField_3);
-		
+
+		n2Text = new JTextField();
+		n2Text.setColumns(3);
+		panel_17.add(n2Text);
+
 		JLabel label_7 = new JLabel("T:");
+
 		panel_17.add(label_7);
-		
-		textField_4 = new JTextField();
-		textField_4.setColumns(3);
-		panel_17.add(textField_4);
-		
-		JComboBox<String> comboBox_2 = new JComboBox<String>();
-		panel_17.add(comboBox_2);
+
+		t2Text = new JTextField();
+		t2Text.setColumns(3);
+		panel_17.add(t2Text);
+
+		t2Drop = new JComboBox<String>();
+		t2Drop.addItem("K");
+		t2Drop.addItem("C");
+		t2Drop.addItem("F");
+		panel_17.add(t2Drop);
 		btnGo_1.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
