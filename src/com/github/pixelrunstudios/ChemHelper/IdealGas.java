@@ -70,8 +70,9 @@ public class IdealGas {
 		int pCount = 0;
 		Map<Integer, Pair<Double, String>> first = new HashMap<Integer, Pair<Double, String>>();
 		Map<Integer, Pair<Double, String>> firstAfter = new HashMap<Integer, Pair<Double, String>>();
+		Map<Integer, Pair<Double, String>> secondAfter = new HashMap<Integer, Pair<Double, String>>();
 		Map<Integer, Pair<Double, String>> second = new HashMap<Integer, Pair<Double, String>>();
-		Map<Integer, Pair<Double, String>> last = new HashMap<Integer, Pair<Double, String>>();
+		Map<Integer, Pair<Double, String>> secondAfterAfter = new HashMap<Integer, Pair<Double, String>>();
 		Map<Integer, Pair<Double, String>> firstAfterAfter = new HashMap<Integer, Pair<Double, String>>();
 
 
@@ -103,44 +104,32 @@ public class IdealGas {
 
 		System.out.println(firstAfter);
 
-		/*
-		pCount = 0;
-		for(Pair<Integer, Pair<Double, String>> p : second){
-			if(p.getValueOne() == 0){
-				second.add(pCount, Pair.make(p.getValueOne(), Pair.make(convert(p.getValueTwo().getValueOne(), p.getValueTwo().getValueTwo(), "kPa"), "kPa")));
+		for(Map.Entry<Integer, Pair<Double, String>> p : second.entrySet()){
+			if(p.getKey() == 0){
+				secondAfter.put(p.getKey(), Pair.make(convert(p.getValue().getValueOne(), p.getValue().getValueTwo(), "kPa"), "kPa"));
 			}
-			if(p.getValueOne() == 1){
-				second.add(pCount, Pair.make(p.getValueOne(), Pair.make(convert(p.getValueTwo().getValueOne(), p.getValueTwo().getValueTwo(), "L"), "L")));
+			if(p.getKey() == 1){
+				secondAfter.put(p.getKey(), Pair.make(convert(p.getValue().getValueOne(), p.getValue().getValueTwo(), "L"), "L"));
 			}
-			if(p.getValueOne() == 3){
-				second.add(pCount, Pair.make(p.getValueOne(), Pair.make(convert(p.getValueTwo().getValueOne(), p.getValueTwo().getValueTwo(), "K"), "K")));
+			if(p.getKey() == 2){
+				secondAfter.put(p.getKey(), p.getValue());
 			}
-			pCount++;
+			if(p.getKey() == 3){
+				secondAfter.put(p.getKey(), Pair.make(convert(p.getValue().getValueOne(), p.getValue().getValueTwo(), "K"), "K"));
+			}
 		}
-		 */
 
 		double lastVal = 0;
 
 		if(firstFilled == 3){
 			int missing = -1;
-			boolean first0 = false;
 			for(int i = 0; i <= 3; i++){
 				if(!firstAfter.containsKey(i)){
 					missing = i;
 				}
-				/*if(first0){
-					if(first.get(i).getValueOne() != first.get(i-1).getValueOne() + 1){
-						missing = firstAfter.get(i).getValueOne() - 1;
-					}
-				}
-				if(i == 0 && first.get(0).getValueOne() == 0){
-					first0 = true;
-				}else{
-					missing = 0;
-				}*/
+
 			}
 
-			System.out.println(missing);
 			lastVal = all4(firstAfter, missing);
 			if(missing == 0){
 				lastVal = convert(lastVal, "kPa", input.get(0).getValueTwo().getValueTwo());
@@ -156,9 +145,28 @@ public class IdealGas {
 
 		}
 
-		if(true/*stuff about first and second lines*/){
-			//blah blah blah
-			//to be added
+
+		if(firstFilled == 2 && secondFilled == 1){
+			if(check(firstAfter, secondAfter).getValueOne()){
+				int sameField = check(firstAfter, secondAfter).getValueTwo().getValueOne();
+				int diffField = check(firstAfter, secondAfter).getValueTwo().getValueTwo();
+				double middle = two(sameField, firstAfter.get(sameField).getValueOne(), secondAfter.get(sameField).getValueOne(), diffField, firstAfter.get(diffField).getValueOne());
+
+				double end = 0.0;
+				if(diffField == 0){
+					end = convert(middle, "kPa", second.get(0).getValueTwo());
+				}
+				else if(diffField == 1){
+					end = convert(middle, "L", second.get(1).getValueTwo());
+				}
+				else if(diffField == 3){
+					end = convert(middle, "K", second.get(3).getValueTwo());
+				}
+
+				secondAfterAfter.putAll(second);
+				secondAfterAfter.put(diffField, Pair.make(end, "std"));
+			}
+
 		}
 
 		Double[] total = new Double[8];
@@ -201,6 +209,26 @@ public class IdealGas {
 		return val;
 	}
 
+	public static double two(int sameField, double field1SVal, double field2SVal, int diffField, double field1DVal){
+		double a = field1SVal;
+		double b = field1DVal;
+		double c = field2SVal;
+
+		if(sameField == 2 || sameField == 3){
+			a = 1.0/a;
+			c = 1.0/c;
+		}
+		if(diffField == 2 || diffField == 3){
+			b = 1.0/b;
+		}
+		double d = a*b*1.0/c;
+
+		if(diffField == 2 || diffField == 3){
+			d = 1.0/d;
+		}
+
+		return d;
+	}
 	public static double convert(double n, String first, String second){
 		if(!first.equals("K") && !second.equals("K")){
 			System.out.println(second);
@@ -222,5 +250,28 @@ public class IdealGas {
 		}
 	}
 
+	public static Pair<Boolean, Pair<Integer,Integer>> check(Map<Integer, Pair<Double,String>> first, Map<Integer, Pair<Double,String>> second){
+		int firstVal = -1;
+		int secondVal = -1;
+		int counter = 0;
+		for(Map.Entry<Integer, Pair<Double,String>> f : first.entrySet()){
+			if(counter == 0){
+				firstVal = f.getKey();
+			}
+			if(counter == 1){
+				secondVal = f.getKey();
+			}
+			counter++;
+		}
+		for(Map.Entry<Integer, Pair<Double,String>> s : second.entrySet()){
+			if(s.getKey() == firstVal){
+				return Pair.make(true, Pair.make(s.getKey(), secondVal));
+			}else if(s.getKey() == secondVal){
+				return Pair.make(true, Pair.make(s.getKey(), firstVal));
+			}
+		}
+		return Pair.make(false, Pair.make(-1,-1));
+
+	}
 
 }
