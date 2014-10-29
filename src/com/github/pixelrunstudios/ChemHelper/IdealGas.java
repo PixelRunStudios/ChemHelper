@@ -83,7 +83,7 @@ public class IdealGas {
 			}
 			else if(pCount >= 4 && p.getValueOne()){
 				secondFilled++;
-				second.put(pCount, p.getValueTwo());
+				second.put(pCount-4, p.getValueTwo());
 			}
 			pCount++;
 		}
@@ -154,14 +154,18 @@ public class IdealGas {
 
 				double end = 0.0;
 				if(diffField == 0){
-					end = convert(middle, "kPa", second.get(0).getValueTwo());
+					end = convert(middle, "kPa", input.get(4).getValueTwo().getValueTwo());
 				}
 				else if(diffField == 1){
-					end = convert(middle, "L", second.get(1).getValueTwo());
+					end = convert(middle, "L", input.get(5).getValueTwo().getValueTwo());
+				}
+				else if(diffField == 2){
+					end = middle;
 				}
 				else if(diffField == 3){
-					end = convert(middle, "K", second.get(3).getValueTwo());
+					end = convert(middle, "K", input.get(7).getValueTwo().getValueTwo());
 				}
+				System.out.println(end);
 
 				secondAfterAfter.putAll(second);
 				secondAfterAfter.put(diffField, Pair.make(end, "std"));
@@ -174,8 +178,8 @@ public class IdealGas {
 			total[p.getKey()] = p.getValue().getValueOne();
 		}
 
-		for(Map.Entry<Integer, Pair<Double, String>> p : firstAfterAfter.entrySet()){
-			total[p.getKey()] = p.getValue().getValueOne();
+		for(Map.Entry<Integer, Pair<Double, String>> p : secondAfterAfter.entrySet()){
+			total[p.getKey() + 4] = p.getValue().getValueOne();
 		}
 
 		return Arrays.asList(total);
@@ -210,9 +214,14 @@ public class IdealGas {
 	}
 
 	public static double two(int sameField, double field1SVal, double field2SVal, int diffField, double field1DVal){
+
+
 		double a = field1SVal;
 		double b = field1DVal;
 		double c = field2SVal;
+		System.out.println("a:" + a);
+		System.out.println("b:" + b);
+		System.out.println("c:" + c);
 
 		if(sameField == 2 || sameField == 3){
 			a = 1.0/a;
@@ -221,12 +230,13 @@ public class IdealGas {
 		if(diffField == 2 || diffField == 3){
 			b = 1.0/b;
 		}
+
 		double d = a*b*1.0/c;
+
 
 		if(diffField == 2 || diffField == 3){
 			d = 1.0/d;
 		}
-
 		return d;
 	}
 	public static double convert(double n, String first, String second){
@@ -266,7 +276,8 @@ public class IdealGas {
 		for(Map.Entry<Integer, Pair<Double,String>> s : second.entrySet()){
 			if(s.getKey() == firstVal){
 				return Pair.make(true, Pair.make(s.getKey(), secondVal));
-			}else if(s.getKey() == secondVal){
+			}
+			else if(s.getKey() == secondVal){
 				return Pair.make(true, Pair.make(s.getKey(), firstVal));
 			}
 		}

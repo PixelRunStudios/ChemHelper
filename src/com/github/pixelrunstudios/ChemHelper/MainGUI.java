@@ -267,6 +267,7 @@ public class MainGUI extends JFrame{
 		panel_9.add(btnGo_1);
 
 		JPanel panel_14 = new JPanel();
+		panel_14.setBorder(new TitledBorder(null, "Ideal Gas", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		contentPane.add(panel_14);
 		panel_14.setLayout(new BoxLayout(panel_14, BoxLayout.Y_AXIS));
 
@@ -351,14 +352,30 @@ public class MainGUI extends JFrame{
 						v2Text.getText(), (String) v2Drop.getSelectedItem(),
 						n2Text.getText(),
 						t2Text.getText(), (String) t2Drop.getSelectedItem());
-				pText.setText(total.get(0).toString());
-				vText.setText(total.get(1).toString());
-				nText.setText(total.get(2).toString());
-				tText.setText(total.get(3).toString());
-				//p2Text.setText(total.get(4).toString());
-				//v2Text.setText(total.get(5).toString());
-				//n2Text.setText(total.get(6).toString());
-				//t2Text.setText(total.get(7).toString());
+				if(total.get(0) != null){
+					pText.setText(total.get(0).toString());
+				}
+				if(total.get(1) != null){
+					vText.setText(total.get(1).toString());
+				}
+				if(total.get(2) != null){
+					nText.setText(total.get(2).toString());
+				}
+				if(total.get(3) != null){
+					tText.setText(total.get(3).toString());
+				}
+				if(total.get(4) != null){
+					p2Text.setText(total.get(4).toString());
+				}
+				if(total.get(5) != null){
+					v2Text.setText(total.get(5).toString());
+				}
+				if(total.get(6) != null){
+					n2Text.setText(total.get(6).toString());
+				}
+				if(total.get(7) != null){
+					t2Text.setText(total.get(7).toString());
+				}
 
 			}
 		});
