@@ -86,7 +86,7 @@ public class ChemistryParser{
 				}
 			}
 		}
-		tempNumber = tempNumber == "" ? "1" : tempNumber;
+		tempNumber = tempNumber.equals("") ? "1" : tempNumber;
 		if(afterParen){
 			inParenToElements(elements, elementsInParen, tempNumber);
 		}
