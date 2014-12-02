@@ -18,7 +18,9 @@ public class Stoichiometry{
 		ChemistryUnit inZ = ChemistryParser.parseCompound(inSub);
 		ChemistryUnit outZ = ChemistryParser.parseCompound(outSub);
 		int inNum = 0;
+		boolean inSet = false;
 		int outNum = 0;
+		boolean outSet = false;
 		Pair<Boolean, Integer> inp = huntDown(in, inZ, outZ);
 		if(inp.getValueTwo() < 0){
 			Debug.printlnDeep("N/A");
@@ -27,9 +29,11 @@ public class Stoichiometry{
 		else{
 			if(inp.getValueOne()){
 				inNum = inp.getValueTwo();
+				inSet = true;
 			}
 			else{
 				outNum = inp.getValueTwo();
+				outSet = true;
 			}
 		}
 		Pair<Boolean, Integer> oup = huntDown(out, inZ, outZ);
@@ -39,10 +43,28 @@ public class Stoichiometry{
 		}
 		else{
 			if(oup.getValueOne()){
-				inNum = oup.getValueTwo();
+				if(inSet){
+					Pair<Boolean, Integer> inZero = huntDown(out, null, outZ);
+					if(inZero.getValueTwo() < 0){
+						Debug.printlnDeep("N/A");
+						return 0;
+					}
+					else{
+						outNum = inZero.getValueTwo();
+					}
+				}
+				else{
+					inNum = oup.getValueTwo();
+				}
 			}
 			else{
-				outNum = oup.getValueTwo();
+				if(outSet){
+					Debug.printlnDeep("N/A");
+					return 0;
+				}
+				else{
+					outNum = oup.getValueTwo();
+				}
 			}
 		}
 		double outOverIn = (double) outNum / (double) inNum;
@@ -54,6 +76,9 @@ public class Stoichiometry{
 			case "mol":
 				inToMole = 1;
 				break;
+			default:
+				Debug.printlnDeep("N/A");
+				throw new IllegalArgumentException("Cannot be converted!");
 		}
 		double outToMole = 0;
 		switch(outUnit){
@@ -63,6 +88,9 @@ public class Stoichiometry{
 			case "mol":
 				outToMole = 1;
 				break;
+			default:
+				Debug.printlnDeep("N/A");
+				throw new IllegalArgumentException("Cannot be converted!");
 		}
 		return amt * inToMole * outOverIn * outToMole;
 	}
@@ -70,10 +98,10 @@ public class Stoichiometry{
 	//True if inExpression is found
 	private static Pair<Boolean, Integer> huntDown(ChemistryUnit in, ChemistryUnit inExpression,
 			ChemistryUnit outExpression){
-		if(in.equals(inExpression)){
+		if(inExpression != null && in.equals(inExpression)){
 			return Pair.make(true, 1);
 		}
-		else if(in.equals(outExpression)){
+		else if(outExpression != null && in.equals(outExpression)){
 			return Pair.make(false, 1);
 		}
 		else if(in.getType() == ChemistryUnit.TYPE_BASE){
